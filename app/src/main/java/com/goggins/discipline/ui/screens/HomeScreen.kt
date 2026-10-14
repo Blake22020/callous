@@ -1,6 +1,5 @@
 package com.goggins.discipline.ui.screens
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -130,19 +129,18 @@ fun HomeScreen(vm: GogginsViewModel, settings: AppSettings, onSettings: () -> Un
                         ProgressRing(progress)
                         Spacer(Modifier.width(14.dp))
                         Column(Modifier.weight(1f)) {
-                            AnimatedContent(targetState = progress, label = "progtxt") { p ->
-                                Text(
-                                    when {
-                                        list.isEmpty() -> "НЕТ ПРИВЫЧЕК.\nДОБАВЬ ПЕРВУЮ."
-                                        p >= 1f -> "ВСЁ ЗАКРЫТО.\nТЫ ЗВЕРЬ."
-                                        p >= 0.6f -> "ДАВИ ДАЛЬШЕ.\nОСТАЛОСЬ НЕМНОГО."
-                                        p > 0f -> "НАЧАЛО ЕСТЬ.\nНЕ СМЕЙ ОСТАНАВЛИВАТЬСЯ."
-                                        else -> "НОЛЬ.\nЗЕРКАЛО ВСЁ ВИДЕЛО."
-                                    },
-                                    fontFamily = Mono, fontWeight = FontWeight.Bold, fontSize = 14.sp,
-                                    color = MaterialTheme.colorScheme.onBackground
-                                )
-                            }
+                            // Без AnimatedContent: в LazyColumn он схлопывал высоту и текст налезал на соседей.
+                            Text(
+                                when {
+                                    list.isEmpty() -> "НЕТ ПРИВЫЧЕК.\nДОБАВЬ ПЕРВУЮ."
+                                    progress >= 1f -> "ВСЁ ЗАКРЫТО.\nТЫ ЗВЕРЬ."
+                                    progress >= 0.6f -> "ДАВИ ДАЛЬШЕ.\nОСТАЛОСЬ НЕМНОГО."
+                                    progress > 0f -> "НАЧАЛО ЕСТЬ.\nНЕ СМЕЙ ОСТАНАВЛИВАТЬСЯ."
+                                    else -> "НОЛЬ.\nЗЕРКАЛО ВСЁ ВИДЕЛО."
+                                },
+                                fontFamily = Mono, fontWeight = FontWeight.Bold, fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
                             Spacer(Modifier.height(6.dp))
                             val done = list.count { it.done }
                             Text(
