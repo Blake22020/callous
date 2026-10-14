@@ -11,7 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -39,23 +40,23 @@ fun StatsScreen(vm: GogginsViewModel) {
     val best = list.maxOfOrNull { it.streak } ?: 0
     val totalClosings = all.size
 
-    LazyColumn(
-        Modifier.fillMaxSize().padding(horizontal = 16.dp),
+    Column(
+        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        item {
+        run {
             Spacer(Modifier.height(12.dp))
             GlyphHeader("СТАТИСТИКА // DATA", "NO LIES")
             DotMatrix()
         }
-        item {
+        run {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 StatBox("СТРИК МАКС", "$best ДН.", Modifier.weight(1f))
                 StatBox("ПРИВЫЧЕК", "${list.size}", Modifier.weight(1f))
                 StatBox("СЕГОДНЯ", "${(progress * 100).toInt()}%", Modifier.weight(1f))
             }
         }
-        item {
+        run {
             NothingCard {
                 Text("ВСЕГО ЗАКРЫТИЙ: $totalClosings", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp, color = MaterialTheme.colorScheme.onBackground)
                 Text(
@@ -66,7 +67,7 @@ fun StatsScreen(vm: GogginsViewModel) {
                 )
             }
         }
-        item {
+        run {
             NothingCard {
                 Text("ТЕПЛОВАЯ КАРТА // 28 ДНЕЙ", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = NothingRed)
                 Spacer(Modifier.height(8.dp))
@@ -98,7 +99,7 @@ fun StatsScreen(vm: GogginsViewModel) {
                 }
             }
         }
-        item {
+        run {
             GlyphHeader("СТРИКИ // STREAKS", "${list.size} ШТ.")
             if (list.isEmpty()) {
                 NothingCard { Text("Пока пусто. Стрик строится днями без пропусков.", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp) }

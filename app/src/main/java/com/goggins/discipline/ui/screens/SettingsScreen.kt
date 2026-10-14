@@ -10,7 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -50,8 +51,8 @@ fun SettingsScreen(vm: GogginsViewModel, s: AppSettings, onBack: () -> Unit) {
     var nameDraft by remember(s.userName) { mutableStateOf(s.userName) }
     var showWipe by remember { mutableStateOf(false) }
 
-    LazyColumn(Modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        item {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        run {
             Row(Modifier.fillMaxWidth().padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onBack) {
                     Icon(Icons.Default.ArrowBack, "Назад", tint = MaterialTheme.colorScheme.onBackground)
@@ -61,7 +62,7 @@ fun SettingsScreen(vm: GogginsViewModel, s: AppSettings, onBack: () -> Unit) {
             DotMatrix()
         }
 
-        item {
+        run {
             NothingCard {
                 Text("БОЕЦ // FIGHTER", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = NothingRed)
                 OutlinedTextField(
@@ -81,7 +82,7 @@ fun SettingsScreen(vm: GogginsViewModel, s: AppSettings, onBack: () -> Unit) {
             }
         }
 
-        item {
+        run {
             NothingCard {
                 Text("МАТ // PROFANITY", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = NothingRed)
                 Text(
@@ -122,7 +123,7 @@ fun SettingsScreen(vm: GogginsViewModel, s: AppSettings, onBack: () -> Unit) {
             }
         }
 
-        item {
+        run {
             NothingCard {
                 SettingRow("ТЁМНАЯ ТЕМА // NOTHING BLACK", s.darkTheme) { vm.setDark(it) }
                 SettingRow("НАПОМИНАНИЕ В 06:00", s.reminderEnabled) {
@@ -135,7 +136,7 @@ fun SettingsScreen(vm: GogginsViewModel, s: AppSettings, onBack: () -> Unit) {
             }
         }
 
-        item {
+        run {
             NothingCard {
                 Text("ОПАСНАЯ ЗОНА", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = NothingRed)
                 Text("Стереть все привычки, прогресс и настройки. Гоггинс бы не одобрил слабость, но решение твоё.", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp, color = Color.Gray)
@@ -148,7 +149,7 @@ fun SettingsScreen(vm: GogginsViewModel, s: AppSettings, onBack: () -> Unit) {
             }
         }
 
-        item {
+        run {
             Text(
                 "GOGGINS.OS v1.0 // СДЕЛАНО С БОЛЬЮ.\nЦитаты: D. Goggins «Can't Hurt Me», «Never Finished».\nSTAY HARD.",
                 fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 10.sp, color = Color.Gray

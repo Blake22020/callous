@@ -12,9 +12,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -62,8 +61,8 @@ fun MindsetScreen(vm: GogginsViewModel, settings: AppSettings) {
     // повторную рекомпозицию и наложение текста друг на друга.
     val shown = true
 
-    LazyColumn(Modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        item {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        run {
             Spacer(Modifier.height(12.dp))
             GlyphHeader("РАЗУМ // MINDSET", "CALLOUS IT")
             DotMatrix()
@@ -104,7 +103,7 @@ fun MindsetScreen(vm: GogginsViewModel, settings: AppSettings) {
             }
         }
 
-        item {
+        run {
             GlyphHeader("SOS // АПТЕЧКА", "ЧИТАЙ ПО СОСТОЯНИЮ")
             NothingCard {
                 Text(
@@ -148,14 +147,14 @@ fun MindsetScreen(vm: GogginsViewModel, settings: AppSettings) {
             }
         }
 
-        item { GlyphHeader("ВСЕ ЦИТАТЫ // ARCHIVE", "${Quotes.all.size} ШТ.") }
-        items(Quotes.all) { q ->
+        run { GlyphHeader("ВСЕ ЦИТАТЫ // ARCHIVE", "${Quotes.all.size} ШТ.") }
+        Quotes.all.forEach { q ->
             NothingCard {
                 Text("«${q.text}»", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 13.sp)
                 Text("— ${q.source}", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = Color.Gray)
             }
         }
-        item { Spacer(Modifier.height(90.dp)) }
+        run { Spacer(Modifier.height(90.dp)) }
     }
 
     if (verdict != null) {

@@ -15,8 +15,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
@@ -88,11 +88,11 @@ fun HomeScreen(vm: GogginsViewModel, settings: AppSettings, onSettings: () -> Un
             ) { Icon(Icons.Default.Add, "Добавить привычку") }
         }
     ) { pad ->
-        LazyColumn(
-            Modifier.fillMaxSize().padding(pad).padding(horizontal = 16.dp),
+        Column(
+            Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(pad).padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            item {
+            run {
                 Row(Modifier.fillMaxWidth().padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         Text(
@@ -118,7 +118,7 @@ fun HomeScreen(vm: GogginsViewModel, settings: AppSettings, onSettings: () -> Un
                 DotMatrix()
             }
 
-            item {
+            run {
                 NothingCard {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         ProgressRing(progress)
@@ -155,7 +155,7 @@ fun HomeScreen(vm: GogginsViewModel, settings: AppSettings, onSettings: () -> Un
                 }
             }
 
-            item {
+            run {
                 NothingCard {
                     Text("◉ ЦИТАТА ДНЯ", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = NothingRed)
                     Spacer(Modifier.height(4.dp))
@@ -164,12 +164,12 @@ fun HomeScreen(vm: GogginsViewModel, settings: AppSettings, onSettings: () -> Un
                 }
             }
 
-            item {
+            run {
                 GlyphHeader("СЕГОДНЯ // TODAY", "${list.count { it.done }}/${list.size}")
             }
 
             if (list.isEmpty()) {
-                item {
+                run {
                     NothingCard {
                         Text(
                             "Пусто. Гоггинс презрительно смотрит на эту пустоту.\nНажми + и добавь первую привычку: бег, отжимания, чтение, холодный душ.",
@@ -179,11 +179,11 @@ fun HomeScreen(vm: GogginsViewModel, settings: AppSettings, onSettings: () -> Un
                 }
             }
 
-            items(list, key = { it.habit.id }) { h ->
+            list.forEach { h ->
                 HabitRow(h, onToggle = { vm.toggle(h, settings.profanity) }, onDelete = { vm.deleteHabit(h.habit) })
             }
 
-            item {
+            run {
                 GlyphHeader("ЗЕРКАЛО // ACCOUNTABILITY", "ЧЕСТНО")
                 NothingCard {
                     BasicTextField(
