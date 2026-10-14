@@ -1,9 +1,5 @@
 package com.goggins.discipline.ui.screens
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -61,7 +57,6 @@ import com.goggins.discipline.ui.components.DotMatrix
 import com.goggins.discipline.ui.components.GlyphHeader
 import com.goggins.discipline.ui.components.NothingCard
 import com.goggins.discipline.ui.components.ShakeBox
-import com.goggins.discipline.ui.theme.Mono
 import com.goggins.discipline.ui.theme.NothingRed
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -102,17 +97,17 @@ fun HomeScreen(vm: GogginsViewModel, settings: AppSettings, onSettings: () -> Un
                     Column(Modifier.weight(1f)) {
                         Text(
                             "GOGGINS.OS",
-                            fontFamily = Mono, fontWeight = FontWeight.Black, fontSize = 13.sp,
+                            fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Black, fontSize = 13.sp,
                             letterSpacing = 3.sp, color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             if (settings.userName.isBlank()) "STAY HARD." else "STAY HARD, ${settings.userName.uppercase()}.",
-                            fontFamily = Mono, fontWeight = FontWeight.Black, fontSize = 26.sp,
+                            fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Black, fontSize = 26.sp,
                             color = MaterialTheme.colorScheme.onBackground
                         )
                         Text(
                             "// $dateStr // НИКТО НЕ ПРИДЁТ ТЕБЯ СПАСАТЬ",
-                            fontFamily = Mono, fontSize = 11.sp,
+                            fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -138,14 +133,14 @@ fun HomeScreen(vm: GogginsViewModel, settings: AppSettings, onSettings: () -> Un
                                     progress > 0f -> "НАЧАЛО ЕСТЬ.\nНЕ СМЕЙ ОСТАНАВЛИВАТЬСЯ."
                                     else -> "НОЛЬ.\nЗЕРКАЛО ВСЁ ВИДЕЛО."
                                 },
-                                fontFamily = Mono, fontWeight = FontWeight.Bold, fontSize = 14.sp,
+                                fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Bold, fontSize = 14.sp,
                                 color = MaterialTheme.colorScheme.onBackground
                             )
                             Spacer(Modifier.height(6.dp))
                             val done = list.count { it.done }
                             Text(
                                 "[$done/${list.size}] ЗАКРЫТО",
-                                fontFamily = Mono, fontSize = 11.sp,
+                                fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Spacer(Modifier.height(6.dp))
@@ -153,7 +148,7 @@ fun HomeScreen(vm: GogginsViewModel, settings: AppSettings, onSettings: () -> Un
                             val filled = (progress * 20).toInt()
                             Text(
                                 "█".repeat(filled) + "░".repeat(20 - filled),
-                                fontFamily = Mono, fontSize = 11.sp, color = NothingRed
+                                fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = NothingRed
                             )
                         }
                     }
@@ -162,10 +157,10 @@ fun HomeScreen(vm: GogginsViewModel, settings: AppSettings, onSettings: () -> Un
 
             item {
                 NothingCard {
-                    Text("◉ ЦИТАТА ДНЯ", fontFamily = Mono, fontSize = 11.sp, color = NothingRed)
+                    Text("◉ ЦИТАТА ДНЯ", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = NothingRed)
                     Spacer(Modifier.height(4.dp))
-                    Text("«${dailyQuote.text}»", fontFamily = Mono, fontSize = 13.sp, color = MaterialTheme.colorScheme.onBackground)
-                    Text("— ${dailyQuote.source}", fontFamily = Mono, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("«${dailyQuote.text}»", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 13.sp, color = MaterialTheme.colorScheme.onBackground)
+                    Text("— ${dailyQuote.source}", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
 
@@ -178,7 +173,7 @@ fun HomeScreen(vm: GogginsViewModel, settings: AppSettings, onSettings: () -> Un
                     NothingCard {
                         Text(
                             "Пусто. Гоггинс презрительно смотрит на эту пустоту.\nНажми + и добавь первую привычку: бег, отжимания, чтение, холодный душ.",
-                            fontFamily = Mono, fontSize = 13.sp, color = MaterialTheme.colorScheme.onBackground
+                            fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 13.sp, color = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 }
@@ -196,13 +191,13 @@ fun HomeScreen(vm: GogginsViewModel, settings: AppSettings, onSettings: () -> Un
                         onValueChange = { noteDraft = it },
                         modifier = Modifier.fillMaxWidth().height(90.dp),
                         textStyle = androidx.compose.ui.text.TextStyle(
-                            fontFamily = Mono, fontSize = 13.sp,
+                            fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 13.sp,
                             color = MaterialTheme.colorScheme.onBackground
                         ),
                         decorationBox = { inner ->
                             if (noteDraft.isEmpty()) Text(
                                 "Где сегодня сдался? Где победил? Пиши правду...",
-                                fontFamily = Mono, fontSize = 12.sp, color = Color.Gray
+                                fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp, color = Color.Gray
                             )
                             inner()
                         }
@@ -215,7 +210,7 @@ fun HomeScreen(vm: GogginsViewModel, settings: AppSettings, onSettings: () -> Un
                             contentColor = MaterialTheme.colorScheme.background
                         ),
                         shape = RoundedCornerShape(8.dp)
-                    ) { Text("ЗАПИСАТЬ // SAVE", fontFamily = Mono) }
+                    ) { Text("ЗАПИСАТЬ // SAVE", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) }
                 }
                 Spacer(Modifier.height(90.dp))
             }
@@ -225,14 +220,14 @@ fun HomeScreen(vm: GogginsViewModel, settings: AppSettings, onSettings: () -> Un
     if (showAdd) {
         AlertDialog(
             onDismissRequest = { showAdd = false },
-            title = { Text("НОВАЯ ПРИВЫЧКА", fontFamily = Mono, fontWeight = FontWeight.Bold) },
+            title = { Text("НОВАЯ ПРИВЫЧКА", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(
                         value = newTitle, onValueChange = { newTitle = it },
-                        label = { Text("Название: бег 5км", fontFamily = Mono) }, singleLine = true
+                        label = { Text("Название: бег 5км", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) }, singleLine = true
                     )
-                    Text("ГЛИФ // ICON", fontFamily = Mono, fontSize = 11.sp)
+                    Text("ГЛИФ // ICON", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         listOf("◼", "●", "▲", "◆", "✕", "☰", "⚡", "⛓").forEach { g ->
                             Box(
@@ -253,9 +248,9 @@ fun HomeScreen(vm: GogginsViewModel, settings: AppSettings, onSettings: () -> Un
                 TextButton(onClick = {
                     vm.addHabit(newTitle, newIcon)
                     newTitle = ""; newIcon = "◼"; showAdd = false
-                }) { Text("ЕБАШ // ADD", fontFamily = Mono, color = NothingRed) }
+                }) { Text("ЕБАШ // ADD", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, color = NothingRed) }
             },
-            dismissButton = { TextButton(onClick = { showAdd = false }) { Text("ОТМЕНА", fontFamily = Mono) } }
+            dismissButton = { TextButton(onClick = { showAdd = false }) { Text("ОТМЕНА", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) } }
         )
     }
 
@@ -266,18 +261,18 @@ fun HomeScreen(vm: GogginsViewModel, settings: AppSettings, onSettings: () -> Un
             title = {
                 Text(
                     if (verdictBad) "ГОГГИНС НЕДОВОЛЕН." else "ГОГГИНС КИВАЕТ.",
-                    fontFamily = Mono, fontWeight = FontWeight.Black,
+                    fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Black,
                     color = if (verdictBad) NothingRed else MaterialTheme.colorScheme.onBackground
                 )
             },
             text = {
                 ShakeBox(shakeKey) {
-                    Text(verdict!!, fontFamily = Mono, fontSize = 15.sp)
+                    Text(verdict!!, fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 15.sp)
                 }
             },
             confirmButton = {
                 TextButton(onClick = { vm.dismissVerdict() }) {
-                    Text(if (verdictBad) "ПОНЯЛ. ИСПРАВЛЮСЬ." else "STAY HARD.", fontFamily = Mono)
+                    Text(if (verdictBad) "ПОНЯЛ. ИСПРАВЛЮСЬ." else "STAY HARD.", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily)
                 }
             }
         )
@@ -286,8 +281,8 @@ fun HomeScreen(vm: GogginsViewModel, settings: AppSettings, onSettings: () -> Un
 
 @Composable
 private fun HabitRow(h: HabitUi, onToggle: () -> Unit, onDelete: () -> Unit) {
-    val scale by animateFloatAsState(if (h.done) 1f else 0.92f, spring(Spring.DampingRatioMediumBouncy), label = "chk")
-    val bg by animateColorAsState(if (h.done) Color(0xFF1A1A1A) else Color.Transparent, label = "bg")
+    val scale = if (h.done) 1f else 0.92f
+    val bg = if (h.done) Color(0xFF1A1A1A) else Color.Transparent
     var confirmDel by remember { mutableStateOf(false) }
 
     Row(
@@ -304,18 +299,18 @@ private fun HabitRow(h: HabitUi, onToggle: () -> Unit, onDelete: () -> Unit) {
                 .border(2.dp, if (h.done) NothingRed else MaterialTheme.colorScheme.onSurfaceVariant, RoundedCornerShape(6.dp)),
             contentAlignment = Alignment.Center
         ) {
-            if (h.done) Text("✕", fontFamily = Mono, fontWeight = FontWeight.Black, fontSize = 20.sp, color = NothingRed)
+            if (h.done) Text("✕", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Black, fontSize = 20.sp, color = NothingRed)
         }
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
             Text(
                 h.habit.title.uppercase(),
-                fontFamily = Mono, fontWeight = FontWeight.Bold, fontSize = 14.sp,
+                fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Bold, fontSize = 14.sp,
                 color = if (h.done) Color.Gray else MaterialTheme.colorScheme.onBackground
             )
             Text(
                 "${h.habit.icon} // STREAK: ${h.streak} ${if (h.streak == 1) "ДЕНЬ" else "ДН."}",
-                fontFamily = Mono, fontSize = 11.sp,
+                fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp,
                 color = if (h.streak > 0) NothingRed else MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -327,14 +322,14 @@ private fun HabitRow(h: HabitUi, onToggle: () -> Unit, onDelete: () -> Unit) {
     if (confirmDel) {
         AlertDialog(
             onDismissRequest = { confirmDel = false },
-            title = { Text("УДАЛИТЬ?", fontFamily = Mono, fontWeight = FontWeight.Bold) },
-            text = { Text("«${h.habit.title}» будет стёрта. Гоггинс такое не одобряет, но это твоя жизнь.", fontFamily = Mono) },
+            title = { Text("УДАЛИТЬ?", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Bold) },
+            text = { Text("«${h.habit.title}» будет стёрта. Гоггинс такое не одобряет, но это твоя жизнь.", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) },
             confirmButton = {
                 TextButton(onClick = { onDelete(); confirmDel = false }) {
-                    Text("УДАЛИТЬ", fontFamily = Mono, color = NothingRed)
+                    Text("УДАЛИТЬ", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, color = NothingRed)
                 }
             },
-            dismissButton = { TextButton(onClick = { confirmDel = false }) { Text("ОСТАВИТЬ", fontFamily = Mono) } }
+            dismissButton = { TextButton(onClick = { confirmDel = false }) { Text("ОСТАВИТЬ", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) } }
         )
     }
 }

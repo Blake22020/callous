@@ -3,8 +3,6 @@ package com.goggins.discipline.ui.screens
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -47,7 +45,6 @@ import com.goggins.discipline.ui.components.DotMatrix
 import com.goggins.discipline.ui.components.GlyphHeader
 import com.goggins.discipline.ui.components.NothingCard
 import com.goggins.discipline.ui.components.ShakeBox
-import com.goggins.discipline.ui.theme.Mono
 import com.goggins.discipline.ui.theme.NothingRed
 
 @Composable
@@ -61,9 +58,9 @@ fun MindsetScreen(vm: GogginsViewModel, settings: AppSettings) {
 
     // Плавное появление цитаты БЕЗ AnimatedContent:
     // AnimatedContent в LazyColumn схлопывал высоту и кнопки налезали на текст.
-    var shown by remember(current) { mutableStateOf(false) }
-    val alpha by animateFloatAsState(if (shown) 1f else 0f, tween(350), label = "qfade")
-    LaunchedEffect(current) { shown = true }
+    // Без анимаций: любая анимация в LazyColumn на части устройств давала
+    // повторную рекомпозицию и наложение текста друг на друга.
+    val shown = true
 
     LazyColumn(Modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         item {
@@ -71,10 +68,10 @@ fun MindsetScreen(vm: GogginsViewModel, settings: AppSettings) {
             GlyphHeader("РАЗУМ // MINDSET", "CALLOUS IT")
             DotMatrix()
             NothingCard {
-                Column(Modifier.alpha(alpha)) {
-                    Text("«${current.text}»", fontFamily = Mono, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Column {
+                    Text("«${current.text}»", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                     Spacer(Modifier.height(6.dp))
-                    Text("— ${current.source}", fontFamily = Mono, fontSize = 12.sp, color = Color.Gray)
+                    Text("— ${current.source}", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp, color = Color.Gray)
                 }
                 Spacer(Modifier.height(12.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -85,24 +82,24 @@ fun MindsetScreen(vm: GogginsViewModel, settings: AppSettings) {
                             contentColor = MaterialTheme.colorScheme.background
                         ),
                         shape = RoundedCornerShape(8.dp)
-                    ) { Text("ЕЩЁ // MORE", fontFamily = Mono) }
+                    ) { Text("ЕЩЁ // MORE", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) }
                     OutlinedButton(
                         onClick = {
                             val cm = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                             cm.setPrimaryClip(ClipData.newPlainText("goggins", "«${current.text}» — ${current.source}"))
                         },
                         shape = RoundedCornerShape(8.dp)
-                    ) { Text("КОПИРОВАТЬ", fontFamily = Mono) }
+                    ) { Text("КОПИРОВАТЬ", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) }
                 }
                 Spacer(Modifier.height(8.dp))
                 OutlinedButton(
                     onClick = { vm.punchMe(settings.profanity) },
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.fillMaxWidth()
-                ) { Text("ДОБЕЙ МЕНЯ // PUNCH ME", fontFamily = Mono, color = NothingRed) }
+                ) { Text("ДОБЕЙ МЕНЯ // PUNCH ME", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, color = NothingRed) }
                 Text(
                     "Уровень жести: ${settings.profanity.title}. Меняется в настройках.",
-                    fontFamily = Mono, fontSize = 10.sp, color = Color.Gray
+                    fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 10.sp, color = Color.Gray
                 )
             }
         }
@@ -112,7 +109,7 @@ fun MindsetScreen(vm: GogginsViewModel, settings: AppSettings) {
             NothingCard {
                 Text(
                     "Плохо? Выбери состояние — получи текст, который надо прочитать целиком. Медленно. Два раза.",
-                    fontFamily = Mono, fontSize = 12.sp, color = Color.Gray
+                    fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp, color = Color.Gray
                 )
                 Spacer(Modifier.height(8.dp))
                 Row(
@@ -126,19 +123,19 @@ fun MindsetScreen(vm: GogginsViewModel, settings: AppSettings) {
                                 onClick = { sosId = s.id },
                                 colors = ButtonDefaults.buttonColors(containerColor = NothingRed, contentColor = Color.White),
                                 shape = RoundedCornerShape(8.dp)
-                            ) { Text("${s.glyph} ${s.label}", fontFamily = Mono, fontSize = 12.sp) }
+                            ) { Text("${s.glyph} ${s.label}", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp) }
                         } else {
                             OutlinedButton(onClick = { sosId = s.id }, shape = RoundedCornerShape(8.dp)) {
-                                Text("${s.glyph} ${s.label}", fontFamily = Mono, fontSize = 12.sp)
+                                Text("${s.glyph} ${s.label}", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp)
                             }
                         }
                     }
                 }
                 Spacer(Modifier.height(10.dp))
-                Text(sos.title, fontFamily = Mono, fontWeight = FontWeight.Black, fontSize = 15.sp)
+                Text(sos.title, fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Black, fontSize = 15.sp)
                 Spacer(Modifier.height(6.dp))
                 sos.body.forEach { p ->
-                    Text(p, fontFamily = Mono, fontSize = 13.sp)
+                    Text(p, fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 13.sp)
                     Spacer(Modifier.height(6.dp))
                 }
                 OutlinedButton(
@@ -147,15 +144,15 @@ fun MindsetScreen(vm: GogginsViewModel, settings: AppSettings) {
                         cm.setPrimaryClip(ClipData.newPlainText("sos", sos.title + "\n\n" + sos.body.joinToString("\n\n")))
                     },
                     shape = RoundedCornerShape(8.dp)
-                ) { Text("СКОПИРОВАТЬ ТЕКСТ", fontFamily = Mono) }
+                ) { Text("СКОПИРОВАТЬ ТЕКСТ", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) }
             }
         }
 
         item { GlyphHeader("ВСЕ ЦИТАТЫ // ARCHIVE", "${Quotes.all.size} ШТ.") }
         items(Quotes.all) { q ->
             NothingCard {
-                Text("«${q.text}»", fontFamily = Mono, fontSize = 13.sp)
-                Text("— ${q.source}", fontFamily = Mono, fontSize = 11.sp, color = Color.Gray)
+                Text("«${q.text}»", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 13.sp)
+                Text("— ${q.source}", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = Color.Gray)
             }
         }
         item { Spacer(Modifier.height(90.dp)) }
@@ -164,9 +161,9 @@ fun MindsetScreen(vm: GogginsViewModel, settings: AppSettings) {
     if (verdict != null) {
         AlertDialog(
             onDismissRequest = { vm.dismissVerdict() },
-            title = { Text("ГОГГИНС ГОВОРИТ.", fontFamily = Mono, fontWeight = FontWeight.Black, color = NothingRed) },
-            text = { ShakeBox(shakeKey) { Text(verdict!!, fontFamily = Mono, fontSize = 15.sp) } },
-            confirmButton = { TextButton(onClick = { vm.dismissVerdict() }) { Text("ПРИНЯЛ.", fontFamily = Mono) } }
+            title = { Text("ГОГГИНС ГОВОРИТ.", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Black, color = NothingRed) },
+            text = { ShakeBox(shakeKey) { Text(verdict!!, fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 15.sp) } },
+            confirmButton = { TextButton(onClick = { vm.dismissVerdict() }) { Text("ПРИНЯЛ.", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) } }
         )
     }
 }

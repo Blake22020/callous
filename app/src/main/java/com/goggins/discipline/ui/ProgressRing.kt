@@ -1,6 +1,5 @@
 package com.goggins.discipline.ui
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -16,13 +15,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.goggins.discipline.ui.theme.Mono
 import com.goggins.discipline.ui.theme.NothingRed
 
 /** Кольцо прогресса дня. Анимировано. В центре — процент и подпись 40% RULE. */
 @Composable
 fun ProgressRing(progress: Float, size: Dp = 148.dp, label: String = "") {
-    val animated by animateFloatAsState(targetValue = progress, label = "ring")
+    val animated = progress
     Box(contentAlignment = Alignment.Center, modifier = Modifier.size(size)) {
         val track = MaterialTheme.colorScheme.surfaceVariant
         Canvas(Modifier.size(size)) {
@@ -37,12 +35,12 @@ fun ProgressRing(progress: Float, size: Dp = 148.dp, label: String = "") {
         androidx.compose.foundation.layout.Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 "${(animated * 100).toInt()}%",
-                fontFamily = Mono, fontWeight = FontWeight.Black, fontSize = 30.sp,
+                fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Black, fontSize = 30.sp,
                 color = MaterialTheme.colorScheme.onBackground
             )
             Text(
                 label.ifEmpty { "40% RULE: ${(animated * 40).toInt()}% ОТ МАКС." },
-                fontFamily = Mono, fontSize = 9.sp,
+                fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 9.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }

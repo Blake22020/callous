@@ -31,7 +31,6 @@ import com.goggins.discipline.ui.GogginsViewModel
 import com.goggins.discipline.ui.components.DotMatrix
 import com.goggins.discipline.ui.components.GlyphHeader
 import com.goggins.discipline.ui.components.NothingCard
-import com.goggins.discipline.ui.theme.Mono
 import com.goggins.discipline.ui.theme.NothingRed
 
 @Composable
@@ -47,7 +46,7 @@ fun ChallengesScreen(vm: GogginsViewModel) {
             NothingCard {
                 Text(
                     "Правила Гоггинса: сорвался — начинай с дня 1. Без переговоров. Отмечай дни кнопкой. Дойди до конца.",
-                    fontFamily = Mono, fontSize = 12.sp, color = MaterialTheme.colorScheme.onBackground
+                    fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp, color = MaterialTheme.colorScheme.onBackground
                 )
             }
         }
@@ -57,12 +56,12 @@ fun ChallengesScreen(vm: GogginsViewModel) {
             NothingCard {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Text(c.title, fontFamily = Mono, fontWeight = FontWeight.Black, fontSize = 15.sp)
-                        Text("☠".repeat(c.skulls) + " // ${c.days} ДН.", fontFamily = Mono, fontSize = 11.sp, color = NothingRed)
+                        Text(c.title, fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Black, fontSize = 15.sp)
+                        Text("☠".repeat(c.skulls) + " // ${c.days} ДН.", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = NothingRed)
                         Spacer(Modifier.height(4.dp))
-                        Text(c.description, fontFamily = Mono, fontSize = 12.sp, color = Color.Gray)
+                        Text(c.description, fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp, color = Color.Gray)
                         Spacer(Modifier.height(4.dp))
-                        Text("ЗАКОН: ${c.rule}", fontFamily = Mono, fontSize = 11.sp)
+                        Text("ЗАКОН: ${c.rule}", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp)
                         Spacer(Modifier.height(8.dp))
                         // прогресс-бар
                         val f = if (c.days == 0) 0f else done.toFloat() / c.days
@@ -79,7 +78,7 @@ fun ChallengesScreen(vm: GogginsViewModel) {
                         Text(
                             if (finished) "ЗАКРЫТО. ТЫ ЗВЕРЬ. STAY HARD."
                             else "ДЕНЬ $done / ${c.days}",
-                            fontFamily = Mono, fontSize = 11.sp,
+                            fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp,
                             color = if (finished) Color(0xFF3DDC84) else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -95,9 +94,9 @@ fun ChallengesScreen(vm: GogginsViewModel) {
                             disabledContainerColor = Color.Gray
                         ),
                         shape = RoundedCornerShape(8.dp)
-                    ) { Text("+1 ДЕНЬ", fontFamily = Mono) }
+                    ) { Text("+1 ДЕНЬ", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) }
                     OutlinedButton(onClick = { vm.resetChallenge(c.id) }, shape = RoundedCornerShape(8.dp)) {
-                        Text("РЕСТАРТ", fontFamily = Mono)
+                        Text("РЕСТАРТ", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily)
                     }
                 }
             }

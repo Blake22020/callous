@@ -43,7 +43,6 @@ import com.goggins.discipline.ui.GogginsViewModel
 import com.goggins.discipline.ui.components.DotMatrix
 import com.goggins.discipline.ui.components.GlyphHeader
 import com.goggins.discipline.ui.components.NothingCard
-import com.goggins.discipline.ui.theme.Mono
 import com.goggins.discipline.ui.theme.NothingRed
 
 @Composable
@@ -64,10 +63,10 @@ fun SettingsScreen(vm: GogginsViewModel, s: AppSettings, onBack: () -> Unit) {
 
         item {
             NothingCard {
-                Text("БОЕЦ // FIGHTER", fontFamily = Mono, fontSize = 11.sp, color = NothingRed)
+                Text("БОЕЦ // FIGHTER", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = NothingRed)
                 OutlinedTextField(
                     value = nameDraft, onValueChange = { nameDraft = it },
-                    label = { Text("Твоё имя", fontFamily = Mono) }, singleLine = true,
+                    label = { Text("Твоё имя", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) }, singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(8.dp))
@@ -78,16 +77,16 @@ fun SettingsScreen(vm: GogginsViewModel, s: AppSettings, onBack: () -> Unit) {
                         contentColor = MaterialTheme.colorScheme.background
                     ),
                     shape = RoundedCornerShape(8.dp)
-                ) { Text("СОХРАНИТЬ", fontFamily = Mono) }
+                ) { Text("СОХРАНИТЬ", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) }
             }
         }
 
         item {
             NothingCard {
-                Text("МАТ // PROFANITY", fontFamily = Mono, fontSize = 11.sp, color = NothingRed)
+                Text("МАТ // PROFANITY", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = NothingRed)
                 Text(
                     "Гоггинс умеет орать. Выбери, насколько жёстко он будет с тобой разговаривать. Уважаем чувствительных: CLEAN — вообще без мата.",
-                    fontFamily = Mono, fontSize = 12.sp, color = Color.Gray
+                    fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp, color = Color.Gray
                 )
                 Spacer(Modifier.height(8.dp))
                 ProfanityLevel.entries.forEach { level ->
@@ -106,19 +105,19 @@ fun SettingsScreen(vm: GogginsViewModel, s: AppSettings, onBack: () -> Unit) {
                         Column(Modifier.weight(1f)) {
                             Text(
                                 (if (selected) "◉ " else "○ ") + level.title,
-                                fontFamily = Mono, fontWeight = FontWeight.Bold, fontSize = 13.sp,
+                                fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Bold, fontSize = 13.sp,
                                 color = if (selected) NothingRed else MaterialTheme.colorScheme.onBackground
                             )
-                            Text(level.subtitle, fontFamily = Mono, fontSize = 11.sp, color = Color.Gray)
+                            Text(level.subtitle, fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = Color.Gray)
                         }
                     }
                     Spacer(Modifier.height(6.dp))
                 }
                 // Живой пример
-                Text("ПРЕДПРОСМОТР ПИНКА:", fontFamily = Mono, fontSize = 11.sp, color = Color.Gray)
+                Text("ПРЕДПРОСМОТР ПИНКА:", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = Color.Gray)
                 Text(
                     "«${VerbalAssault.insult(s.profanity, seed = 3)}»",
-                    fontFamily = Mono, fontSize = 13.sp, fontWeight = FontWeight.Bold
+                    fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 13.sp, fontWeight = FontWeight.Bold
                 )
             }
         }
@@ -131,28 +130,28 @@ fun SettingsScreen(vm: GogginsViewModel, s: AppSettings, onBack: () -> Unit) {
                 }
                 Text(
                     "Напоминание приходит щадящим (максимум MILD), чтобы не получить бан и не обидеть. Жесть — только внутри приложения.",
-                    fontFamily = Mono, fontSize = 11.sp, color = Color.Gray
+                    fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = Color.Gray
                 )
             }
         }
 
         item {
             NothingCard {
-                Text("ОПАСНАЯ ЗОНА", fontFamily = Mono, fontSize = 11.sp, color = NothingRed)
-                Text("Стереть все привычки, прогресс и настройки. Гоггинс бы не одобрил слабость, но решение твоё.", fontFamily = Mono, fontSize = 12.sp, color = Color.Gray)
+                Text("ОПАСНАЯ ЗОНА", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = NothingRed)
+                Text("Стереть все привычки, прогресс и настройки. Гоггинс бы не одобрил слабость, но решение твоё.", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp, color = Color.Gray)
                 Spacer(Modifier.height(8.dp))
                 Button(
                     onClick = { showWipe = true },
                     colors = ButtonDefaults.buttonColors(containerColor = NothingRed, contentColor = Color.White),
                     shape = RoundedCornerShape(8.dp)
-                ) { Text("СТЕРЕТЬ ВСЁ", fontFamily = Mono) }
+                ) { Text("СТЕРЕТЬ ВСЁ", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) }
             }
         }
 
         item {
             Text(
                 "GOGGINS.OS v1.0 // СДЕЛАНО С БОЛЬЮ.\nЦитаты: D. Goggins «Can't Hurt Me», «Never Finished».\nSTAY HARD.",
-                fontFamily = Mono, fontSize = 10.sp, color = Color.Gray
+                fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 10.sp, color = Color.Gray
             )
             Spacer(Modifier.height(90.dp))
         }
@@ -161,14 +160,14 @@ fun SettingsScreen(vm: GogginsViewModel, s: AppSettings, onBack: () -> Unit) {
     if (showWipe) {
         AlertDialog(
             onDismissRequest = { showWipe = false },
-            title = { Text("ТОЧНО СТЕРЕТЬ?", fontFamily = Mono, fontWeight = FontWeight.Bold) },
-            text = { Text("Это действие необратимо. Слабый голос говорит «да». Что скажешь ты?", fontFamily = Mono) },
+            title = { Text("ТОЧНО СТЕРЕТЬ?", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Bold) },
+            text = { Text("Это действие необратимо. Слабый голос говорит «да». Что скажешь ты?", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) },
             confirmButton = {
                 TextButton(onClick = { vm.wipeAll(); showWipe = false; onBack() }) {
-                    Text("СТЕРЕТЬ", fontFamily = Mono, color = NothingRed)
+                    Text("СТЕРЕТЬ", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, color = NothingRed)
                 }
             },
-            dismissButton = { TextButton(onClick = { showWipe = false }) { Text("ОТМЕНА", fontFamily = Mono) } }
+            dismissButton = { TextButton(onClick = { showWipe = false }) { Text("ОТМЕНА", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) } }
         )
     }
 }
@@ -176,7 +175,7 @@ fun SettingsScreen(vm: GogginsViewModel, s: AppSettings, onBack: () -> Unit) {
 @Composable
 private fun SettingRow(title: String, checked: Boolean, onChange: (Boolean) -> Unit) {
     Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(title, fontFamily = Mono, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+        Text(title, fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
         Switch(
             checked = checked, onCheckedChange = onChange,
             colors = SwitchDefaults.colors(checkedThumbColor = NothingRed)

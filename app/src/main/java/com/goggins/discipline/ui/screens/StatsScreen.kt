@@ -28,7 +28,6 @@ import com.goggins.discipline.ui.GogginsViewModel
 import com.goggins.discipline.ui.components.DotMatrix
 import com.goggins.discipline.ui.components.GlyphHeader
 import com.goggins.discipline.ui.components.NothingCard
-import com.goggins.discipline.ui.theme.Mono
 import com.goggins.discipline.ui.theme.NothingRed
 
 @Composable
@@ -58,21 +57,21 @@ fun StatsScreen(vm: GogginsViewModel) {
         }
         item {
             NothingCard {
-                Text("ВСЕГО ЗАКРЫТИЙ: $totalClosings", fontFamily = Mono, fontSize = 12.sp, color = MaterialTheme.colorScheme.onBackground)
+                Text("ВСЕГО ЗАКРЫТИЙ: $totalClosings", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp, color = MaterialTheme.colorScheme.onBackground)
                 Text(
                     if (best >= 7) "Неделя без пропусков. Гоггинс кивает."
                     else if (totalClosings == 0) "Ноль. Зеркало всё видело. Начни сегодня."
                     else "Продолжай. Стрик строится днями, а не настроением.",
-                    fontFamily = Mono, fontSize = 12.sp, color = Color.Gray
+                    fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp, color = Color.Gray
                 )
             }
         }
         item {
             NothingCard {
-                Text("ТЕПЛОВАЯ КАРТА // 28 ДНЕЙ", fontFamily = Mono, fontSize = 11.sp, color = NothingRed)
+                Text("ТЕПЛОВАЯ КАРТА // 28 ДНЕЙ", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = NothingRed)
                 Spacer(Modifier.height(8.dp))
                 if (heat.isEmpty() || list.isEmpty()) {
-                    Text("Нет данных. Начни отмечать привычки — карта заполнится.", fontFamily = Mono, fontSize = 12.sp)
+                    Text("Нет данных. Начни отмечать привычки — карта заполнится.", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp)
                 } else {
                     Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
                         heat.chunked(7).forEach { week ->
@@ -95,14 +94,14 @@ fun StatsScreen(vm: GogginsViewModel) {
                         }
                     }
                     Spacer(Modifier.height(6.dp))
-                    Text("░ ПРОВАЛ ▓ ЧАСТИЧНО █ STAY HARD", fontFamily = Mono, fontSize = 10.sp, color = Color.Gray)
+                    Text("░ ПРОВАЛ ▓ ЧАСТИЧНО █ STAY HARD", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 10.sp, color = Color.Gray)
                 }
             }
         }
         item {
             GlyphHeader("СТРИКИ // STREAKS", "${list.size} ШТ.")
             if (list.isEmpty()) {
-                NothingCard { Text("Пока пусто. Стрик строится днями без пропусков.", fontFamily = Mono, fontSize = 12.sp) }
+                NothingCard { Text("Пока пусто. Стрик строится днями без пропусков.", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp) }
             } else {
                 list.sortedByDescending { it.streak }.forEach { h ->
                     NothingCard {
@@ -110,13 +109,13 @@ fun StatsScreen(vm: GogginsViewModel) {
                             Text(h.habit.icon, fontSize = 18.sp)
                             Spacer(Modifier.padding(4.dp))
                             Column(Modifier.weight(1f)) {
-                                Text(h.habit.title.uppercase(), fontFamily = Mono, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                Text(h.habit.title.uppercase(), fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                                 val f = (h.streak / 30f).coerceIn(0.03f, 1f)
                                 Box(Modifier.fillMaxWidth().height(6.dp).background(Color.Gray.copy(0.25f), RoundedCornerShape(3.dp))) {
                                     Box(Modifier.fillMaxWidth(f).height(6.dp).background(NothingRed, RoundedCornerShape(3.dp)))
                                 }
                             }
-                            Text("${h.streak}", fontFamily = Mono, fontWeight = FontWeight.Black, fontSize = 22.sp, color = NothingRed)
+                            Text("${h.streak}", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Black, fontSize = 22.sp, color = NothingRed)
                         }
                     }
                     Spacer(Modifier.height(8.dp))
@@ -133,7 +132,7 @@ private fun StatBox(title: String, value: String, modifier: Modifier = Modifier)
         modifier.background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp)).padding(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(title, fontFamily = Mono, fontSize = 10.sp, color = Color.Gray)
-        Text(value, fontFamily = Mono, fontWeight = FontWeight.Black, fontSize = 18.sp)
+        Text(title, fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 10.sp, color = Color.Gray)
+        Text(value, fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Black, fontSize = 18.sp)
     }
 }

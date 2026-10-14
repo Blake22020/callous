@@ -22,7 +22,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.goggins.discipline.ui.theme.Mono
 import com.goggins.discipline.ui.theme.NothingRed
 import kotlinx.coroutines.delay
 
@@ -32,7 +31,7 @@ fun GlyphHeader(title: String, sub: String = "", modifier: Modifier = Modifier) 
     Box(modifier.fillMaxWidth().padding(vertical = 8.dp)) {
         Text(
             text = "$title",
-            fontFamily = Mono,
+            fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
             fontWeight = FontWeight.Black,
             fontSize = 22.sp,
             letterSpacing = 2.sp,
@@ -41,7 +40,7 @@ fun GlyphHeader(title: String, sub: String = "", modifier: Modifier = Modifier) 
         if (sub.isNotEmpty()) {
             Text(
                 text = sub,
-                fontFamily = Mono,
+                fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
                 fontSize = 11.sp,
                 letterSpacing = 1.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,

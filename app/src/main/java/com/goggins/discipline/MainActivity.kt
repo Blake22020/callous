@@ -43,7 +43,6 @@ import com.goggins.discipline.ui.components.DotMatrix
 import com.goggins.discipline.ui.navigation.NavGraph
 import com.goggins.discipline.ui.navigation.Routes
 import com.goggins.discipline.ui.theme.GogginsTheme
-import com.goggins.discipline.ui.theme.Mono
 import com.goggins.discipline.ui.theme.NothingRed
 
 class MainActivity : ComponentActivity() {
@@ -86,8 +85,8 @@ private fun AppShell(vm: GogginsViewModel) {
                     NavigationBarItem(
                         selected = route == r,
                         onClick = { if (route != r) nav.navigate(r) { launchSingleTop = true } },
-                        icon = { Text(glyph, fontFamily = Mono, fontSize = 16.sp, color = if (route == r) NothingRed else Color.Gray) },
-                        label = { Text(label, fontFamily = Mono, fontSize = 9.sp) },
+                        icon = { Text(glyph, fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 16.sp, color = if (route == r) NothingRed else Color.Gray) },
+                        label = { Text(label, fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 9.sp) },
                         colors = NavigationBarItemDefaults.colors(
                             selectedTextColor = NothingRed,
                             indicatorColor = Color.Transparent
@@ -111,23 +110,23 @@ private fun Onboarding(vm: GogginsViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.height(40.dp))
-        Text("GOGGINS.OS", fontFamily = Mono, fontWeight = FontWeight.Black, fontSize = 14.sp, letterSpacing = 4.sp, color = Color.Gray)
-        Text("STAY HARD.", fontFamily = Mono, fontWeight = FontWeight.Black, fontSize = 44.sp)
-        Text("ТРЕКЕР ДИСЦИПЛИНЫ", fontFamily = Mono, fontSize = 13.sp, color = NothingRed)
+        Text("GOGGINS.OS", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Black, fontSize = 14.sp, letterSpacing = 4.sp, color = Color.Gray)
+        Text("STAY HARD.", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Black, fontSize = 44.sp)
+        Text("ТРЕКЕР ДИСЦИПЛИНЫ", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 13.sp, color = NothingRed)
         DotMatrix()
         Spacer(Modifier.height(16.dp))
         Text(
             "Никто не придёт тебя спасать.\nЭто приложение — твоё зеркало ответственности: привычки, стрики, испытания и пинки от Гоггинса.",
-            fontFamily = Mono, fontSize = 13.sp
+            fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 13.sp
         )
         Spacer(Modifier.height(16.dp))
         OutlinedTextField(
             value = name, onValueChange = { name = it },
-            label = { Text("Как звать, боец?", fontFamily = Mono) },
+            label = { Text("Как звать, боец?", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) },
             singleLine = true, modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.height(12.dp))
-        Text("НАСКОЛЬКО ЖЁСТКО С ТОБОЙ ГОВОРИТЬ?", fontFamily = Mono, fontSize = 11.sp, color = Color.Gray)
+        Text("НАСКОЛЬКО ЖЁСТКО С ТОБОЙ ГОВОРИТЬ?", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = Color.Gray)
         ProfanityLevel.entries.forEach { l ->
             Button(
                 onClick = { level = l },
@@ -137,9 +136,9 @@ private fun Onboarding(vm: GogginsViewModel) {
                     containerColor = if (level == l) NothingRed else MaterialTheme.colorScheme.surface,
                     contentColor = if (level == l) Color.White else MaterialTheme.colorScheme.onSurface
                 )
-            ) { Text(l.title, fontFamily = Mono, fontSize = 12.sp) }
+            ) { Text(l.title, fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp) }
         }
-        Text(level.subtitle, fontFamily = Mono, fontSize = 11.sp, color = Color.Gray)
+        Text(level.subtitle, fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = Color.Gray)
         Spacer(Modifier.weight(1f))
         Button(
             onClick = {
@@ -151,7 +150,7 @@ private fun Onboarding(vm: GogginsViewModel) {
             modifier = Modifier.fillMaxWidth().height(54.dp),
             shape = RoundedCornerShape(10.dp),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onBackground, contentColor = MaterialTheme.colorScheme.background)
-        ) { Text("НАЧАТЬ СТРАДАТЬ // GO", fontFamily = Mono, fontWeight = FontWeight.Bold) }
+        ) { Text("НАЧАТЬ СТРАДАТЬ // GO", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Bold) }
         Spacer(Modifier.height(12.dp))
     }
 }
