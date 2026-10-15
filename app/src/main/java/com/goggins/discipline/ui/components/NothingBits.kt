@@ -3,11 +3,16 @@ package com.goggins.discipline.ui.components
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,14 +33,15 @@ import kotlinx.coroutines.delay
 /** Заголовок в духе Nothing: моноширинный, капс, красная точка. */
 @Composable
 fun GlyphHeader(title: String, sub: String = "", modifier: Modifier = Modifier) {
-    Box(modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+    Row(modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(
-            text = "$title",
+            text = title,
             fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
             fontWeight = FontWeight.Black,
             fontSize = 22.sp,
             letterSpacing = 2.sp,
-            color = MaterialTheme.colorScheme.onBackground
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.weight(1f)
         )
         if (sub.isNotEmpty()) {
             Text(
@@ -44,13 +50,12 @@ fun GlyphHeader(title: String, sub: String = "", modifier: Modifier = Modifier) 
                 fontSize = 11.sp,
                 letterSpacing = 1.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.align(Alignment.BottomEnd)
+                maxLines = 1,
+                modifier = Modifier.padding(start = 8.dp)
             )
         }
         // красная точка Nothing
-        Canvas(modifier = Modifier.align(Alignment.TopEnd).padding(top = 4.dp)) {
-            drawCircle(NothingRed, radius = 8f)
-        }
+        Box(Modifier.padding(start = 6.dp).size(6.dp).background(NothingRed, CircleShape))
     }
 }
 
@@ -68,7 +73,7 @@ fun DotMatrix(modifier: Modifier = Modifier, dots: Int = 48) {
 /** Карточка с тонкой рамкой, как корпус Nothing Phone. */
 @Composable
 fun NothingCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    Box(
+    Column(
         modifier
             .fillMaxWidth()
             .border(1.dp, MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(14.dp))
