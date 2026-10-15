@@ -12,5 +12,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "GogginsDiscipline"
+rootProject.name = "Callous"
 include(":app")

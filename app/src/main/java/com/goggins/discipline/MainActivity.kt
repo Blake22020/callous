@@ -110,7 +110,7 @@ private fun Onboarding(vm: GogginsViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.height(40.dp))
-        Text("GOGGINS.OS", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Black, fontSize = 14.sp, letterSpacing = 4.sp, color = Color.Gray)
+        Text("CALLOUS.OS", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Black, fontSize = 14.sp, letterSpacing = 4.sp, color = Color.Gray)
         Text("STAY HARD.", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Black, fontSize = 44.sp)
         Text("ТРЕКЕР ДИСЦИПЛИНЫ", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 13.sp, color = NothingRed)
         DotMatrix()

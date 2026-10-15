@@ -96,7 +96,7 @@ fun HomeScreen(vm: GogginsViewModel, settings: AppSettings, onSettings: () -> Un
                 Row(Modifier.fillMaxWidth().padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         Text(
-                            "GOGGINS.OS",
+                            "CALLOUS.OS",
                             fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Black, fontSize = 13.sp,
                             letterSpacing = 3.sp, color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
