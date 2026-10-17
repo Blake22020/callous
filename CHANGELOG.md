@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-10-17
+
+### Fixed
+
+- Onboarding no longer overflows: profanity options showed their long description inline, so rows grew to several lines — only 2 of 4 were visible and the continue button was pushed off-screen
+  - Each option is now a single line (title + marker); the description appears once under the list for the selected level
+  - Onboarding content scrolls, with the continue button pinned so it is always reachable
+
 ## [1.4.0] - 2026-10-17
 
 ### Changed
@@ -75,7 +83,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Profanity levels: CLEAN / MILD / SAVAGE / NIGHTMARE
 - Daily reminder and light/dark themes
 
-[Unreleased]: https://github.com/Blake22020/callous/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/Blake22020/callous/compare/v1.4.1...HEAD
+[1.4.1]: https://github.com/Blake22020/callous/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/Blake22020/callous/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/Blake22020/callous/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/Blake22020/callous/compare/v1.2.0...v1.3.0

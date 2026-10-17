@@ -163,7 +163,7 @@ fun SettingsScreen(vm: GogginsViewModel, s: AppSettings, onBack: () -> Unit) {
 
         run {
             Text(
-                "CALLOUS v1.3.1 · СДЕЛАНО С БОЛЬЮ.\nЦитаты: D. Goggins «Can't Hurt Me», «Never Finished».\nSTAY HARD.",
+                "CALLOUS · СДЕЛАНО С БОЛЬЮ.\nЦитаты: D. Goggins «Can't Hurt Me», «Never Finished».\nSTAY HARD.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
