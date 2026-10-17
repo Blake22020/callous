@@ -14,7 +14,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.CheckCircle
@@ -124,69 +126,83 @@ private fun Onboarding(vm: GogginsViewModel) {
         Modifier.fillMaxSize().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(Modifier.height(44.dp))
-        Text(
-            "CALLOUS",
-            style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 5.sp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(Modifier.height(6.dp))
-        Text(
-            "STAY HARD.",
-            style = MaterialTheme.typography.headlineSmall.copy(fontSize = 40.sp, fontWeight = FontWeight.SemiBold)
-        )
-        Spacer(Modifier.height(4.dp))
-        Text(
-            "ТРЕКЕР ДИСЦИПЛИНЫ",
-            style = MaterialTheme.typography.labelLarge,
-            color = NothingRed
-        )
-        Spacer(Modifier.height(14.dp))
-        DotMatrix()
-        Spacer(Modifier.height(18.dp))
-        Text(
-            "Никто не придёт тебя спасать.\nЭто приложение — твоё зеркало ответственности: привычки, стрики, испытания и пинки от Гоггинса.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
-        Spacer(Modifier.height(22.dp))
-        OutlinedTextField(
-            value = name, onValueChange = { name = it },
-            label = { Text("Как звать, боец?") },
-            singleLine = true, modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(Modifier.height(18.dp))
-        Text(
-            "НАСКОЛЬКО ЖЁСТКО С ТОБОЙ ГОВОРИТЬ?",
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(Modifier.height(8.dp))
-        ProfanityLevel.entries.forEach { l ->
-            val selected = level == l
-            Row(
-                Modifier.fillMaxWidth().padding(bottom = 8.dp)
-                    .clip(MaterialTheme.shapes.small)
-                    .background(if (selected) NothingRed else MaterialTheme.colorScheme.surface)
-                    .clickable { level = l }
-                    .padding(vertical = 14.dp, horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    l.title,
-                    style = MaterialTheme.typography.labelLarge,
-                    color = if (selected) Color.White else MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.weight(1f)
-                )
-                Text(
-                    l.subtitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = if (selected) Color.White.copy(alpha = 0.85f) else MaterialTheme.colorScheme.onSurfaceVariant
-                )
+        // Контент скроллится, чтобы кнопка продолжения всегда оставалась внизу.
+        Column(
+            Modifier.weight(1f).verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(Modifier.height(24.dp))
+            Text(
+                "CALLOUS",
+                style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 5.sp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(6.dp))
+            Text(
+                "STAY HARD.",
+                style = MaterialTheme.typography.headlineSmall.copy(fontSize = 40.sp, fontWeight = FontWeight.SemiBold)
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                "ТРЕКЕР ДИСЦИПЛИНЫ",
+                style = MaterialTheme.typography.labelLarge,
+                color = NothingRed
+            )
+            Spacer(Modifier.height(14.dp))
+            DotMatrix()
+            Spacer(Modifier.height(18.dp))
+            Text(
+                "Никто не придёт тебя спасать.\nЭто приложение — твоё зеркало ответственности: привычки, стрики, испытания и пинки от Гоггинса.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+            Spacer(Modifier.height(22.dp))
+            OutlinedTextField(
+                value = name, onValueChange = { name = it },
+                label = { Text("Как звать, боец?") },
+                singleLine = true, modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(18.dp))
+            Text(
+                "НАСКОЛЬКО ЖЁСТКО С ТОБОЙ ГОВОРИТЬ?",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(10.dp))
+            ProfanityLevel.entries.forEach { l ->
+                val selected = level == l
+                Row(
+                    Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                        .clip(MaterialTheme.shapes.small)
+                        .background(if (selected) NothingRed else MaterialTheme.colorScheme.surface)
+                        .clickable { level = l }
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        l.title,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = if (selected) Color.White else MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        if (selected) "◉" else "○",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = if (selected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
+            // Описание — только для выбранного уровня, одной строкой под списком.
+            Spacer(Modifier.height(4.dp))
+            Text(
+                level.subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+            Spacer(Modifier.height(16.dp))
         }
-        Spacer(Modifier.weight(1f))
         Button(
             onClick = {
                 vm.setName(name.trim())
