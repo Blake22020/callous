@@ -37,14 +37,23 @@ jobs:
       - name: Build Release APK
         run: ./gradle-8.7/bin/gradle assembleRelease --stacktrace
 
+      # APK именуется как <name>-<version>-<variant>.apk, например callous-1.4.0-debug.apk
+      - name: Name APKs with app name and version
+        run: |
+          VERSION=$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts)
+          mkdir -p dist
+          cp app/build/outputs/apk/debug/app-debug.apk       "dist/callous-${VERSION}-debug.apk"
+          cp app/build/outputs/apk/release/app-release-unsigned.apk "dist/callous-${VERSION}-release-unsigned.apk"
+          ls -la dist
+
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
           name: callous-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          path: dist/callous-*-debug.apk
 
       - name: Upload Release APK
         uses: actions/upload-artifact@v4
         with:
           name: callous-release-apk
-          path: app/build/outputs/apk/release/*.apk
+          path: dist/callous-*-release-unsigned.apk
