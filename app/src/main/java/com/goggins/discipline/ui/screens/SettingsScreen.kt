@@ -1,5 +1,6 @@
 package com.goggins.discipline.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -57,129 +59,145 @@ fun SettingsScreen(vm: GogginsViewModel, s: AppSettings, onBack: () -> Unit) {
                 IconButton(onClick = onBack) {
                     Icon(Icons.Default.ArrowBack, "Назад", tint = MaterialTheme.colorScheme.onBackground)
                 }
-                GlyphHeader("НАСТРОЙКИ // SETUP", "v1.0")
+                GlyphHeader("НАСТРОЙКИ · SETUP", "v1.0")
             }
             DotMatrix()
         }
 
         run {
             NothingCard {
-                Text("БОЕЦ // FIGHTER", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = NothingRed)
+                Text("БОЕЦ · FIGHTER", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(Modifier.height(10.dp))
                 OutlinedTextField(
                     value = nameDraft, onValueChange = { nameDraft = it },
-                    label = { Text("Твоё имя", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) }, singleLine = true,
+                    label = { Text("Твоё имя") }, singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(12.dp))
                 Button(
                     onClick = { vm.setName(nameDraft.trim()) },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.onBackground,
                         contentColor = MaterialTheme.colorScheme.background
                     ),
-                    shape = RoundedCornerShape(8.dp)
-                ) { Text("СОХРАНИТЬ", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) }
+                    shape = MaterialTheme.shapes.small
+                ) { Text("СОХРАНИТЬ", style = MaterialTheme.typography.labelLarge) }
             }
         }
 
         run {
             NothingCard {
-                Text("МАТ // PROFANITY", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = NothingRed)
+                Text("МАТ · PROFANITY", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(Modifier.height(10.dp))
                 Text(
                     "Гоггинс умеет орать. Выбери, насколько жёстко он будет с тобой разговаривать. Уважаем чувствительных: CLEAN — вообще без мата.",
-                    fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp, color = Color.Gray
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(14.dp))
                 ProfanityLevel.entries.forEach { level ->
                     val selected = s.profanity == level
                     Row(
                         Modifier.fillMaxWidth()
-                            .border(
-                                1.dp,
-                                if (selected) NothingRed else MaterialTheme.colorScheme.surfaceVariant,
-                                RoundedCornerShape(10.dp)
-                            )
+                            .clip(MaterialTheme.shapes.small)
+                            .background(if (selected) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface)
                             .clickable { vm.setProfanity(level) }
-                            .padding(12.dp),
+                            .padding(14.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(Modifier.weight(1f)) {
                             Text(
                                 (if (selected) "◉ " else "○ ") + level.title,
-                                fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Bold, fontSize = 13.sp,
+                                style = MaterialTheme.typography.titleMedium,
                                 color = if (selected) NothingRed else MaterialTheme.colorScheme.onBackground
                             )
-                            Text(level.subtitle, fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = Color.Gray)
+                            Spacer(Modifier.height(2.dp))
+                            Text(level.subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
-                    Spacer(Modifier.height(6.dp))
+                    Spacer(Modifier.height(8.dp))
                 }
                 // Живой пример
-                Text("ПРЕДПРОСМОТР ПИНКА:", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = Color.Gray)
+                Text("ПРЕДПРОСМОТР", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(Modifier.height(4.dp))
                 Text(
                     "«${VerbalAssault.insult(s.profanity, seed = 3)}»",
-                    fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 13.sp, fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
         }
 
         run {
             NothingCard {
-                SettingRow("ТЁМНАЯ ТЕМА // NOTHING BLACK", s.darkTheme) { vm.setDark(it) }
+                SettingRow("ТЁМНАЯ ТЕМА · NOTHING BLACK", s.darkTheme) { vm.setDark(it) }
                 SettingRow("НАПОМИНАНИЕ В 06:00", s.reminderEnabled) {
                     vm.setReminder(it, s.reminderHour, s.reminderMinute)
                 }
+                Spacer(Modifier.height(4.dp))
                 Text(
                     "Напоминание приходит щадящим (максимум MILD), чтобы не получить бан и не обидеть. Жесть — только внутри приложения.",
-                    fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = Color.Gray
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
 
         run {
             NothingCard {
-                Text("ОПАСНАЯ ЗОНА", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = NothingRed)
-                Text("Стереть все привычки, прогресс и настройки. Гоггинс бы не одобрил слабость, но решение твоё.", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp, color = Color.Gray)
+                Text("ОПАСНАЯ ЗОНА", style = MaterialTheme.typography.labelSmall, color = NothingRed)
                 Spacer(Modifier.height(8.dp))
+                Text(
+                    "Стереть все привычки, прогресс и настройки. Гоггинс бы не одобрил слабость, но решение твоё.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(Modifier.height(14.dp))
                 Button(
                     onClick = { showWipe = true },
                     colors = ButtonDefaults.buttonColors(containerColor = NothingRed, contentColor = Color.White),
-                    shape = RoundedCornerShape(8.dp)
-                ) { Text("СТЕРЕТЬ ВСЁ", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) }
+                    shape = MaterialTheme.shapes.small
+                ) { Text("СТЕРЕТЬ ВСЁ", style = MaterialTheme.typography.labelLarge) }
             }
         }
 
         run {
             Text(
-                "CALLOUS v1.3.1 // СДЕЛАНО С БОЛЬЮ.\nЦитаты: D. Goggins «Can't Hurt Me», «Never Finished».\nSTAY HARD.",
-                fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 10.sp, color = Color.Gray
+                "CALLOUS v1.3.1 · СДЕЛАНО С БОЛЬЮ.\nЦитаты: D. Goggins «Can't Hurt Me», «Never Finished».\nSTAY HARD.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Spacer(Modifier.height(90.dp))
+            Spacer(Modifier.height(96.dp))
         }
     }
 
     if (showWipe) {
         AlertDialog(
             onDismissRequest = { showWipe = false },
-            title = { Text("ТОЧНО СТЕРЕТЬ?", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Bold) },
-            text = { Text("Это действие необратимо. Слабый голос говорит «да». Что скажешь ты?", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) },
+            title = { Text("Точно стереть?", style = MaterialTheme.typography.titleLarge) },
+            text = { Text("Это действие необратимо. Слабый голос говорит «да». Что скажешь ты?", style = MaterialTheme.typography.bodyMedium) },
             confirmButton = {
                 TextButton(onClick = { vm.wipeAll(); showWipe = false; onBack() }) {
-                    Text("СТЕРЕТЬ", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, color = NothingRed)
+                    Text("СТЕРЕТЬ", style = MaterialTheme.typography.labelLarge, color = NothingRed)
                 }
             },
-            dismissButton = { TextButton(onClick = { showWipe = false }) { Text("ОТМЕНА", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) } }
+            dismissButton = { TextButton(onClick = { showWipe = false }) { Text("ОТМЕНА", style = MaterialTheme.typography.labelLarge) } }
         )
     }
 }
 
 @Composable
 private fun SettingRow(title: String, checked: Boolean, onChange: (Boolean) -> Unit) {
-    Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(title, fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+    Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            title,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.weight(1f)
+        )
         Switch(
             checked = checked, onCheckedChange = onChange,
-            colors = SwitchDefaults.colors(checkedThumbColor = NothingRed)
+            colors = SwitchDefaults.colors(checkedThumbColor = NothingRed, checkedTrackColor = NothingRed.copy(alpha = 0.35f))
         )
     }
 }

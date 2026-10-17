@@ -64,53 +64,56 @@ fun MindsetScreen(vm: GogginsViewModel, settings: AppSettings) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         run {
             Spacer(Modifier.height(12.dp))
-            GlyphHeader("РАЗУМ // MINDSET", "CALLOUS IT")
+            GlyphHeader("РАЗУМ · MINDSET", "CALLOUS IT")
             DotMatrix()
             NothingCard {
                 Column {
-                    Text("«${current.text}»", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                    Spacer(Modifier.height(6.dp))
-                    Text("— ${current.source}", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp, color = Color.Gray)
+                    Text("«${current.text}»", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
+                    Spacer(Modifier.height(8.dp))
+                    Text("— ${current.source}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                Spacer(Modifier.height(12.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Spacer(Modifier.height(16.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     Button(
                         onClick = { current = Quotes.random() },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.onBackground,
                             contentColor = MaterialTheme.colorScheme.background
                         ),
-                        shape = RoundedCornerShape(8.dp)
-                    ) { Text("ЕЩЁ // MORE", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) }
+                        shape = MaterialTheme.shapes.small
+                    ) { Text("ЕЩЁ", style = MaterialTheme.typography.labelLarge) }
                     OutlinedButton(
                         onClick = {
                             val cm = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                            cm.setPrimaryClip(ClipData.newPlainText("goggins", "«${current.text}» — ${current.source}"))
+                            cm.setPrimaryClip(ClipData.newPlainText("callous", "«${current.text}» — ${current.source}"))
                         },
-                        shape = RoundedCornerShape(8.dp)
-                    ) { Text("КОПИРОВАТЬ", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) }
+                        shape = MaterialTheme.shapes.small
+                    ) { Text("КОПИРОВАТЬ", style = MaterialTheme.typography.labelLarge) }
                 }
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(10.dp))
                 OutlinedButton(
                     onClick = { vm.punchMe(settings.profanity) },
-                    shape = RoundedCornerShape(8.dp),
+                    shape = MaterialTheme.shapes.small,
                     modifier = Modifier.fillMaxWidth()
-                ) { Text("ДОБЕЙ МЕНЯ // PUNCH ME", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, color = NothingRed) }
+                ) { Text("ДОБЕЙ МЕНЯ", style = MaterialTheme.typography.labelLarge, color = NothingRed) }
+                Spacer(Modifier.height(8.dp))
                 Text(
                     "Уровень жести: ${settings.profanity.title}. Меняется в настройках.",
-                    fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 10.sp, color = Color.Gray
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
 
         run {
-            GlyphHeader("SOS // АПТЕЧКА", "ЧИТАЙ ПО СОСТОЯНИЮ")
+            GlyphHeader("SOS · АПТЕЧКА", "ЧИТАЙ ПО СОСТОЯНИЮ")
             NothingCard {
                 Text(
                     "Плохо? Выбери состояние — получи текст, который надо прочитать целиком. Медленно. Два раза.",
-                    fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp, color = Color.Gray
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(14.dp))
                 Row(
                     Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -121,48 +124,49 @@ fun MindsetScreen(vm: GogginsViewModel, settings: AppSettings) {
                             Button(
                                 onClick = { sosId = s.id },
                                 colors = ButtonDefaults.buttonColors(containerColor = NothingRed, contentColor = Color.White),
-                                shape = RoundedCornerShape(8.dp)
-                            ) { Text("${s.glyph} ${s.label}", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp) }
+                                shape = MaterialTheme.shapes.small
+                            ) { Text("${s.glyph} ${s.label}", style = MaterialTheme.typography.labelLarge) }
                         } else {
-                            OutlinedButton(onClick = { sosId = s.id }, shape = RoundedCornerShape(8.dp)) {
-                                Text("${s.glyph} ${s.label}", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp)
+                            OutlinedButton(onClick = { sosId = s.id }, shape = MaterialTheme.shapes.small) {
+                                Text("${s.glyph} ${s.label}", style = MaterialTheme.typography.labelLarge)
                             }
                         }
                     }
                 }
+                Spacer(Modifier.height(18.dp))
+                Text(sos.title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
                 Spacer(Modifier.height(10.dp))
-                Text(sos.title, fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Black, fontSize = 15.sp)
-                Spacer(Modifier.height(6.dp))
                 sos.body.forEach { p ->
-                    Text(p, fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 13.sp)
-                    Spacer(Modifier.height(6.dp))
+                    Text(p, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
+                    Spacer(Modifier.height(10.dp))
                 }
                 OutlinedButton(
                     onClick = {
                         val cm = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                         cm.setPrimaryClip(ClipData.newPlainText("sos", sos.title + "\n\n" + sos.body.joinToString("\n\n")))
                     },
-                    shape = RoundedCornerShape(8.dp)
-                ) { Text("СКОПИРОВАТЬ ТЕКСТ", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) }
+                    shape = MaterialTheme.shapes.small
+                ) { Text("СКОПИРОВАТЬ ТЕКСТ", style = MaterialTheme.typography.labelLarge) }
             }
         }
 
-        run { GlyphHeader("ВСЕ ЦИТАТЫ // ARCHIVE", "${Quotes.all.size} ШТ.") }
+        run { GlyphHeader("ВСЕ ЦИТАТЫ · ARCHIVE", "${Quotes.all.size} ШТ.") }
         Quotes.all.forEach { q ->
             NothingCard {
-                Text("«${q.text}»", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 13.sp)
-                Text("— ${q.source}", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = Color.Gray)
+                Text("«${q.text}»", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onBackground)
+                Spacer(Modifier.height(6.dp))
+                Text("— ${q.source}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
-        run { Spacer(Modifier.height(90.dp)) }
+        run { Spacer(Modifier.height(96.dp)) }
     }
 
     if (verdict != null) {
         AlertDialog(
             onDismissRequest = { vm.dismissVerdict() },
-            title = { Text("ГОГГИНС ГОВОРИТ.", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Black, color = NothingRed) },
-            text = { ShakeBox(shakeKey) { Text(verdict!!, fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 15.sp) } },
-            confirmButton = { TextButton(onClick = { vm.dismissVerdict() }) { Text("ПРИНЯЛ.", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) } }
+            title = { Text("Гоггинс говорит.", style = MaterialTheme.typography.titleLarge, color = NothingRed) },
+            text = { ShakeBox(shakeKey) { Text(verdict!!, style = MaterialTheme.typography.bodyLarge) } },
+            confirmButton = { TextButton(onClick = { vm.dismissVerdict() }) { Text("ПРИНЯЛ.", style = MaterialTheme.typography.labelLarge) } }
         )
     }
 }

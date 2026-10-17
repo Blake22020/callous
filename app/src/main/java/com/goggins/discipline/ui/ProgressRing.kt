@@ -35,12 +35,12 @@ fun ProgressRing(progress: Float, size: Dp = 148.dp, label: String = "") {
         androidx.compose.foundation.layout.Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 "${(animated * 100).toInt()}%",
-                fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Black, fontSize = 30.sp,
+                style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onBackground
             )
             Text(
-                label.ifEmpty { "40% RULE: ${(animated * 40).toInt()}% ОТ МАКС." },
-                fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 9.sp,
+                label.ifEmpty { "40% RULE · ${(animated * 40).toInt()}% ОТ МАКС." },
+                style = MaterialTheme.typography.bodySmall.copy(fontSize = 9.sp, letterSpacing = 0.sp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }

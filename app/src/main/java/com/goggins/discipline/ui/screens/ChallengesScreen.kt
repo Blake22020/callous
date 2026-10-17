@@ -14,6 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -41,12 +42,13 @@ fun ChallengesScreen(vm: GogginsViewModel) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         run {
             Spacer(Modifier.height(12.dp))
-            GlyphHeader("ИСПЫТАНИЯ // HELL", "${Challenges.all.size} ШТ.")
+            GlyphHeader("ИСПЫТАНИЯ · HELL", "${Challenges.all.size} ШТ.")
             DotMatrix()
             NothingCard {
                 Text(
                     "Правила Гоггинса: сорвался — начинай с дня 1. Без переговоров. Отмечай дни кнопкой. Дойди до конца.",
-                    fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp, color = MaterialTheme.colorScheme.onBackground
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
         }
@@ -56,47 +58,43 @@ fun ChallengesScreen(vm: GogginsViewModel) {
             NothingCard {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Text(c.title, fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontWeight = FontWeight.Black, fontSize = 15.sp)
-                        Text("☠".repeat(c.skulls) + " // ${c.days} ДН.", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp, color = NothingRed)
-                        Spacer(Modifier.height(4.dp))
-                        Text(c.description, fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 12.sp, color = Color.Gray)
-                        Spacer(Modifier.height(4.dp))
-                        Text("ЗАКОН: ${c.rule}", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp)
+                        Text(c.title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
+                        Spacer(Modifier.height(2.dp))
+                        Text("☠ × ${c.skulls} · ${c.days} ДН.", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Spacer(Modifier.height(10.dp))
+                        Text(c.description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(Modifier.height(8.dp))
-                        // прогресс-бар
-                        val f = if (c.days == 0) 0f else done.toFloat() / c.days
-                        androidx.compose.foundation.layout.Box(
-                            Modifier.fillMaxWidth().height(8.dp)
-                                .background(Color.Gray.copy(0.25f), RoundedCornerShape(4.dp))
-                        ) {
-                            androidx.compose.foundation.layout.Box(
-                                Modifier.fillMaxWidth(f).height(8.dp)
-                                    .background(if (finished) Color(0xFF3DDC84) else NothingRed, RoundedCornerShape(4.dp))
-                            )
-                        }
-                        Spacer(Modifier.height(4.dp))
+                        Text("ЗАКОН: ${c.rule}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onBackground)
+                        Spacer(Modifier.height(12.dp))
+                        LinearProgressIndicator(
+                            progress = { if (c.days == 0) 0f else (done.toFloat() / c.days).coerceIn(0f, 1f) },
+                            color = if (finished) Color(0xFF3DDC84) else NothingRed,
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                            modifier = Modifier.fillMaxWidth().height(4.dp)
+                        )
+                        Spacer(Modifier.height(10.dp))
                         Text(
                             if (finished) "ЗАКРЫТО. ТЫ ЗВЕРЬ. STAY HARD."
                             else "ДЕНЬ $done / ${c.days}",
-                            fontFamily = MaterialTheme.typography.bodyLarge.fontFamily, fontSize = 11.sp,
+                            style = MaterialTheme.typography.labelSmall,
                             color = if (finished) Color(0xFF3DDC84) else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
-                Spacer(Modifier.height(10.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Spacer(Modifier.height(16.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     Button(
                         onClick = { vm.toggleChallengeDay(c.id) },
                         enabled = !finished,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.onBackground,
                             contentColor = MaterialTheme.colorScheme.background,
-                            disabledContainerColor = Color.Gray
+                            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant
                         ),
-                        shape = RoundedCornerShape(8.dp)
-                    ) { Text("+1 ДЕНЬ", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily) }
-                    OutlinedButton(onClick = { vm.resetChallenge(c.id) }, shape = RoundedCornerShape(8.dp)) {
-                        Text("РЕСТАРТ", fontFamily = MaterialTheme.typography.bodyLarge.fontFamily)
+                        shape = MaterialTheme.shapes.small
+                    ) { Text("+1 ДЕНЬ", style = MaterialTheme.typography.labelLarge) }
+                    OutlinedButton(onClick = { vm.resetChallenge(c.id) }, shape = MaterialTheme.shapes.small) {
+                        Text("РЕСТАРТ", style = MaterialTheme.typography.labelLarge)
                     }
                 }
             }
