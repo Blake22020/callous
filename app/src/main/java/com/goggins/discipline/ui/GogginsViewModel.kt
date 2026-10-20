@@ -12,8 +12,11 @@ import com.goggins.discipline.data.local.AppDatabase
 import com.goggins.discipline.data.local.ChallengeProgress
 import com.goggins.discipline.data.local.Completion
 import com.goggins.discipline.data.local.Habit
+import com.goggins.discipline.data.productivity.ProductivityManager
+import com.goggins.discipline.data.productivity.ProductivitySnapshot
 import com.goggins.discipline.data.repo.HabitRepository
 import com.goggins.discipline.data.repo.todayKey
+import com.goggins.discipline.data.content.PowerLaws
 import com.goggins.discipline.data.settings.AppSettings
 import com.goggins.discipline.data.settings.ProfanityLevel
 import com.goggins.discipline.data.settings.SettingsManager
@@ -27,6 +30,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 
@@ -39,6 +44,8 @@ class GogginsViewModel(app: Application) : AndroidViewModel(app) {
         .fallbackToDestructiveMigration().build()
     private val repo = HabitRepository(db)
     private val settingsManager = SettingsManager(app)
+    private val productivityManager = ProductivityManager(app)
+    private val dailyFieldJobs = mutableMapOf<String, Job>()
 
     val settingsState: StateFlow<SettingsUiState> = settingsManager.settings
         .map { SettingsUiState(settings = it, loaded = true) }
@@ -72,6 +79,8 @@ class GogginsViewModel(app: Application) : AndroidViewModel(app) {
     val allCompletions = _all.asStateFlow()
     val noteText = _note.asStateFlow()
     val challengeState = _challenges.asStateFlow()
+    val productivity: StateFlow<ProductivitySnapshot> = productivityManager.snapshot
+        .stateIn(viewModelScope, SharingStarted.Eagerly, ProductivitySnapshot())
 
     val progress: StateFlow<Float> = combine(_habits, _today) { h, t ->
         if (h.isEmpty()) 0f else t.size.toFloat() / h.size.toFloat()
@@ -121,6 +130,75 @@ class GogginsViewModel(app: Application) : AndroidViewModel(app) {
     fun saveNote(text: String) {
         viewModelScope.launch { repo.saveNote(todayKey(), text) }
     }
+
+    // ---------- daily commitments and focus ----------
+    fun ensureDailyProgress(date: String) {
+        viewModelScope.launch { productivityManager.ensureDay(date, lawAction(date)) }
+    }
+
+    fun saveDailyCommitment(date: String, kind: String, value: String) {
+        val key = "$date:$kind"
+        dailyFieldJobs[key]?.cancel()
+        dailyFieldJobs[key] = viewModelScope.launch {
+            delay(250)
+            productivityManager.updateDay(date, lawAction(date)) { day ->
+                when (kind) {
+                    "work" -> day.copy(work = value, workDone = day.workDone && value.isNotBlank())
+                    "discipline" -> day.copy(discipline = value, disciplineDone = day.disciplineDone && value.isNotBlank())
+                    else -> day.copy(respect = value, respectDone = day.respectDone && value.isNotBlank())
+                }
+            }
+        }
+    }
+
+    fun toggleDailyCommitment(date: String, kind: String) {
+        viewModelScope.launch {
+            dailyFieldJobs["$date:$kind"]?.join()
+            val updated = productivityManager.updateDay(date, lawAction(date)) { day ->
+                when (kind) {
+                    "work" -> if (day.work.isNotBlank()) day.copy(workDone = !day.workDone) else day
+                    "discipline" -> if (day.discipline.isNotBlank()) day.copy(disciplineDone = !day.disciplineDone) else day
+                    else -> if (day.respect.isNotBlank()) day.copy(respectDone = !day.respectDone) else day
+                }
+            }
+            if (kind == "respect" && updated.respectDone) settingsManager.markPowerLawApplied(date)
+        }
+    }
+
+    fun saveProof(date: String, value: String) {
+        val key = "$date:proof"
+        dailyFieldJobs[key]?.cancel()
+        dailyFieldJobs[key] = viewModelScope.launch {
+            delay(250)
+            productivityManager.updateDay(date, lawAction(date)) { it.copy(proof = value) }
+        }
+    }
+
+    fun startFocusSession(date: String) {
+        viewModelScope.launch {
+            productivityManager.updateDay(date, lawAction(date)) { day ->
+                if (day.focusStartedAtMillis == 0L) day.copy(focusStartedAtMillis = System.currentTimeMillis()) else day
+            }
+        }
+    }
+
+    fun finishFocusSession(date: String, startedAtMillis: Long) {
+        viewModelScope.launch {
+            val minutes = ((System.currentTimeMillis() - startedAtMillis) / 60_000L).toInt().coerceIn(1, 25)
+            productivityManager.updateDay(date, lawAction(date)) { day ->
+                if (day.focusStartedAtMillis != startedAtMillis) day
+                else day.copy(
+                    focusStartedAtMillis = 0L,
+                    focusMinutes = day.focusMinutes + minutes,
+                    focusSessions = day.focusSessions + 1
+                )
+            }
+        }
+    }
+
+    private fun lawAction(date: String): String = runCatching {
+        PowerLaws.forDate(LocalDate.parse(date)).action
+    }.getOrDefault("")
 
     // ---------- verdicts ----------
     private fun sayGood(level: ProfanityLevel, userName: String, habitTitle: String) {
@@ -174,11 +252,20 @@ class GogginsViewModel(app: Application) : AndroidViewModel(app) {
     fun completeOnboarding(name: String, profanity: ProfanityLevel) = viewModelScope.launch {
         settingsManager.completeOnboarding(name, profanity)
     }
-    fun markPowerLawApplied(date: String) = viewModelScope.launch { settingsManager.markPowerLawApplied(date) }
+    fun markPowerLawApplied(date: String) = viewModelScope.launch {
+        settingsManager.markPowerLawApplied(date)
+        val action = lawAction(date)
+        productivityManager.updateDay(date, action) { day ->
+            day.copy(respect = day.respect.ifBlank { action }, respectDone = true)
+        }
+    }
 
     fun wipeAll() {
         viewModelScope.launch {
+            dailyFieldJobs.values.forEach { it.cancel() }
+            dailyFieldJobs.clear()
             repo.wipeAll()
+            productivityManager.clear()
             settingsManager.resetAll()
         }
     }

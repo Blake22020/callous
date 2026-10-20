@@ -5,6 +5,19 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-10-20
+
+### Added
+
+- Daily work, discipline, and respect commitments, with the law of the day supplying the respect action
+- Persistent 25-minute focus sessions and weekly focus totals
+- Evening review, recovery prompt after a missed plan, and a local bank of daily wins
+
+### Changed
+
+- Simplified Today, Stats, Challenges, and Laws screens; secondary details can be expanded when needed
+- Habit list now collapses under the daily plan
+
 ## [Unreleased]
 
 ## [1.5.0] - 2026-10-20
@@ -97,7 +110,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Profanity levels: CLEAN / MILD / SAVAGE / NIGHTMARE
 - Daily reminder and light/dark themes
 
-[Unreleased]: https://github.com/Blake22020/callous/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/Blake22020/callous/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/Blake22020/callous/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/Blake22020/callous/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/Blake22020/callous/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/Blake22020/callous/compare/v1.3.1...v1.4.0

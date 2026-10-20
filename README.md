@@ -41,13 +41,13 @@ No accounts. No analytics. No ads. Your data never leaves the device.
 
 | Screen | What it does |
 | :--- | :--- |
-| **Today** | Habit list with a custom Nothing-style checkbox, daily progress ring (40% rule), quote of the day |
+| **Today** | One work goal, one discipline action, one respect action, and a 25-minute focus timer; habits stay available in a compact list |
 | **Streaks** | Automatic consecutive-day counting per habit |
-| **Mirror** | Daily accountability note — where you quit, where you won. Honesty only |
-| **Data** | 28-day heatmap, best streak, total completions |
-| **Hell** | 9 multi-day challenges (Hell Week, Stay Hard 30, 4×4×48…) — miss a day and you start over at day one |
-| **Mindset** | 60 Goggins quotes, a *Punch me* button, and one-tap copy |
-| **SOS** | 9 first-aid texts keyed to your state of mind. Read it twice |
+| **Review** | Evening accountability note and a local bank of proof-of-progress entries |
+| **Data** | Weekly commitment and focus summary, 28-day heatmap, streaks, and total completions |
+| **Challenges** | 9 multi-day challenges (Hell Week, Stay Hard 30, 4×4×48…) with expandable rules and progress |
+| **Laws** | A daily practical lesson inspired by one of the 48 laws, with an example, application, defense, and action |
+| **Mindset tools** | 60 Goggins quotes, SOS texts, and a tone-aware *Punch me* button |
 | **Verdicts** | Uncheck a habit and get a verbal kick; complete one and get a nod |
 
 Also included:
@@ -99,16 +99,16 @@ Every push to `main` runs [`.github/workflows/android.yml`](.github/workflows/an
 - installs JDK 17 and the Android 34 platform,
 - builds **both** debug and release APKs,
 - renames them to `callous-<version>-<variant>.apk`,
-- and uploads them as workflow artifacts.
+- uploads them as workflow artifacts.
 
-You can download a fresh build from the **Actions** tab without building locally.
+Pushing a `v*` tag runs the same build and publishes both APKs as GitHub release assets. You can download development builds from the **Actions** tab without building locally.
 
 ## Tech stack
 
 - **Kotlin 2.0** with KSP
 - **Jetpack Compose** (Material 3, Compose BOM 2024.09) and Navigation Compose
 - **Room** for local persistence (habits, completions, challenge progress)
-- **DataStore** for settings
+- **DataStore** for settings and daily productivity records
 - **WorkManager** for the daily reminder
 - **Coroutines + StateFlow** for reactive state
 - Min SDK 26 · Target/Compile SDK 34 · JDK 17
@@ -122,6 +122,7 @@ app/src/main/java/com/goggins/discipline/
 ├── data/
 │   ├── content/             # Quotes, Challenges, Sos, VerbalAssault
 │   ├── local/               # Room: HabitDao, AppDatabase
+│   ├── productivity/        # Daily commitments, focus sessions, proof bank
 │   ├── repo/                # HabitRepository
 │   └── settings/            # ProfanityLevel, SettingsManager (DataStore)
 ├── workers/                 # ReminderWorker

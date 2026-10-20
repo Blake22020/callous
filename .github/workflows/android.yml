@@ -3,8 +3,12 @@ name: Android Build
 on:
   push:
     branches: [ main, master ]
+    tags: [ 'v*' ]
   pull_request:
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -57,3 +61,31 @@ jobs:
         with:
           name: callous-release-apk
           path: dist/callous-*-release-unsigned.apk
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download debug APK
+        uses: actions/download-artifact@v4
+        with:
+          name: callous-debug-apk
+          path: dist
+
+      - name: Download release APK
+        uses: actions/download-artifact@v4
+        with:
+          name: callous-release-apk
+          path: dist
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/*.apk \
+            --verify-tag \
+            --title "CALLOUS $GITHUB_REF_NAME" \
+            --generate-notes

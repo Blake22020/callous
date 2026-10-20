@@ -11,149 +11,149 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.goggins.discipline.ui.GogginsViewModel
-import com.goggins.discipline.ui.components.DotMatrix
-import com.goggins.discipline.ui.components.GlyphHeader
 import com.goggins.discipline.ui.components.NothingCard
 import com.goggins.discipline.ui.theme.NothingRed
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun StatsScreen(vm: GogginsViewModel) {
-    val list by vm.ui.collectAsState()
+    val habits by vm.ui.collectAsState()
     val progress by vm.progress.collectAsState()
-    val all by vm.allCompletions.collectAsState()
-    val heat = GogginsViewModel.heatmap(all, list.size, 28)
-    val best = list.maxOfOrNull { it.streak } ?: 0
-    val totalClosings = all.size
+    val completions by vm.allCompletions.collectAsState()
+    val productivity by vm.productivity.collectAsState()
+    var showStreaks by remember { mutableStateOf(false) }
+    val heat = GogginsViewModel.heatmap(completions, habits.size, 28)
+    val longestStreak = habits.maxOfOrNull { it.streak } ?: 0
+    val totalClosings = completions.size
+    val week = productivity.days.filter { runCatching { LocalDate.parse(it.date).isAfter(LocalDate.now().minusDays(7)) }.getOrDefault(false) }
+    val commitmentsDone = week.sumOf { it.commitmentsDone }
+    val commitmentsPlanned = week.sumOf { it.commitmentsPlanned }
+    val focusMinutes = week.sumOf { it.focusMinutes }
+    val proofEntries = productivity.days.filter { it.proof.isNotBlank() }.takeLast(7).reversed()
 
     Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        run {
+        Column(Modifier.padding(top = 18.dp)) {
+            Text("Обзор", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onBackground)
+            Text("Факты за неделю и привычки за 28 дней", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+
+        NothingCard {
+            Text("Неделя", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
             Spacer(Modifier.height(12.dp))
-            GlyphHeader("СТАТИСТИКА · DATA", "NO LIES")
-            DotMatrix()
-        }
-        run {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                StatBox("СТРИК МАКС", "$best ДН.", Modifier.weight(1f))
-                StatBox("ПРИВЫЧЕК", "${list.size}", Modifier.weight(1f))
-                StatBox("СЕГОДНЯ", "${(progress * 100).toInt()}%", Modifier.weight(1f))
+            Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                Metric("Обещания", "$commitmentsDone / $commitmentsPlanned", Modifier.weight(1f))
+                Metric("Фокус", "$focusMinutes мин", Modifier.weight(1f))
             }
-        }
-        run {
-            NothingCard {
-                Text("ВСЕГО ЗАКРЫТИЙ · $totalClosings", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Spacer(Modifier.height(6.dp))
-                Text(
-                    if (best >= 7) "Неделя без пропусков. Гоггинс кивает."
-                    else if (totalClosings == 0) "Ноль. Зеркало всё видело. Начни сегодня."
-                    else "Продолжай. Стрик строится днями, а не настроением.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground
+            if (commitmentsPlanned > 0) {
+                Spacer(Modifier.height(12.dp))
+                LinearProgressIndicator(
+                    progress = { (commitmentsDone.toFloat() / commitmentsPlanned.toFloat()).coerceIn(0f, 1f) },
+                    modifier = Modifier.fillMaxWidth().height(4.dp),
+                    color = NothingRed,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant
                 )
             }
         }
-        run {
+
+        if (proofEntries.isNotEmpty()) {
             NothingCard {
-                Text("ТЕПЛОВАЯ КАРТА · 28 ДНЕЙ", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Spacer(Modifier.height(12.dp))
-                if (heat.isEmpty() || list.isEmpty()) {
-                    Text("Нет данных. Начни отмечать привычки — карта заполнится.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                } else {
-                    Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                        heat.chunked(7).forEach { week ->
-                            Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-                                week.forEach { (_, v) ->
-                                    Box(
-                                        Modifier.size(30.dp).background(
-                                            when {
-                                                v >= 1f -> NothingRed
-                                                v >= 0.6f -> Color(0xFF7A1015)
-                                                v >= 0.3f -> Color(0xFF3A3A3A)
-                                                v > 0f -> Color(0xFF222222)
-                                                else -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
-                                            },
-                                            MaterialTheme.shapes.extraSmall
-                                        )
-                                    )
-                                }
-                            }
-                        }
-                    }
+                Text("Банк побед", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
+                Spacer(Modifier.height(4.dp))
+                Text("Сохраняй реальные доказательства своего прогресса.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                proofEntries.forEach { day ->
                     Spacer(Modifier.height(12.dp))
-                    // Легенда цветовыми чипами вместо ASCII-символов.
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Box(Modifier.size(10.dp).background(NothingRed, MaterialTheme.shapes.extraSmall))
-                        Text("ПРОВАЛ", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Spacer(Modifier.width(8.dp))
-                        Box(Modifier.size(10.dp).background(Color(0xFF3A3A3A), MaterialTheme.shapes.extraSmall))
-                        Text("ЧАСТИЧНО", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Spacer(Modifier.width(8.dp))
-                        Box(Modifier.size(10.dp).background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f), MaterialTheme.shapes.extraSmall))
-                        Text("STAY HARD", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
+                    Text(day.date.toRussianDate(), style = MaterialTheme.typography.labelSmall, color = NothingRed)
+                    Spacer(Modifier.height(3.dp))
+                    Text(day.proof, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
                 }
             }
         }
-        run {
-            GlyphHeader("СТРИКИ · STREAKS", "${list.size} ШТ.")
-            if (list.isEmpty()) {
-                NothingCard { Text("Пока пусто. Стрик строится днями без пропусков.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+
+        NothingCard {
+            Text("Привычки", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
+            Spacer(Modifier.height(12.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(18.dp)) {
+                Metric("Серия", "$longestStreak дн.", Modifier.weight(1f))
+                Metric("Отметки", "$totalClosings", Modifier.weight(1f))
+                Metric("Сегодня", "${(progress * 100).toInt()}%", Modifier.weight(1f))
+            }
+            Spacer(Modifier.height(16.dp))
+            Text("Последние 28 дней", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.height(10.dp))
+            if (heat.isEmpty() || habits.isEmpty()) {
+                Text("Отмечай привычки, чтобы увидеть историю.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
-                list.sortedByDescending { it.streak }.forEach { h ->
-                    NothingCard {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(h.habit.icon, fontSize = 18.sp)
-                            Spacer(Modifier.width(12.dp))
-                            Column(Modifier.weight(1f)) {
-                                Text(h.habit.title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
-                                Spacer(Modifier.height(8.dp))
-                                LinearProgressIndicator(
-                                    progress = { (h.streak / 30f).coerceIn(0f, 1f) },
-                                    color = NothingRed,
-                                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                                    modifier = Modifier.fillMaxWidth().height(4.dp)
+                Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                    heat.chunked(7).forEach { weekRow ->
+                        Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                            weekRow.forEach { (_, value) ->
+                                Box(
+                                    Modifier.size(30.dp).background(
+                                        when {
+                                            value >= 1f -> NothingRed
+                                            value > 0f -> MaterialTheme.colorScheme.surfaceVariant
+                                            else -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.28f)
+                                        },
+                                        MaterialTheme.shapes.extraSmall
+                                    )
                                 )
                             }
-                            Spacer(Modifier.width(12.dp))
-                            Text("${h.streak}", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
                         }
                     }
-                    Spacer(Modifier.height(8.dp))
                 }
             }
-            Spacer(Modifier.height(96.dp))
+            if (habits.isNotEmpty()) {
+                Spacer(Modifier.height(10.dp))
+                TextButton(onClick = { showStreaks = !showStreaks }) {
+                    Text(if (showStreaks) "Скрыть серии" else "Показать серии привычек", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                if (showStreaks) {
+                    habits.sortedByDescending { it.streak }.forEach { habit ->
+                        Row(Modifier.fillMaxWidth().padding(vertical = 7.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Text(habit.habit.icon, fontSize = 18.sp)
+                            Spacer(Modifier.size(10.dp))
+                            Text(habit.habit.title, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.weight(1f))
+                            Text("${habit.streak} дн.", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
+                }
+            }
         }
+        Spacer(Modifier.height(72.dp))
     }
 }
 
 @Composable
-private fun StatBox(title: String, value: String, modifier: Modifier = Modifier) {
-    Column(
-        modifier.background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.medium)
-            .padding(horizontal = 12.dp, vertical = 18.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(title, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(Modifier.height(8.dp))
+private fun Metric(title: String, value: String, modifier: Modifier = Modifier) {
+    Column(modifier) {
+        Text(title, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(Modifier.height(4.dp))
         Text(value, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
     }
 }
+
+private fun String.toRussianDate(): String = runCatching {
+    LocalDate.parse(this).format(DateTimeFormatter.ofPattern("d MMMM", Locale("ru")))
+}.getOrDefault(this)

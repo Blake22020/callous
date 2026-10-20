@@ -23,7 +23,14 @@ object Routes {
 @Composable
 fun NavGraph(nav: NavHostController, vm: GogginsViewModel, settings: AppSettings) {
     NavHost(nav, startDestination = Routes.TODAY) {
-        composable(Routes.TODAY) { HomeScreen(vm, settings, onSettings = { nav.navigate(Routes.SETTINGS) }) }
+        composable(Routes.TODAY) {
+            HomeScreen(
+                vm,
+                settings,
+                onSettings = { nav.navigate(Routes.SETTINGS) },
+                onLaws = { nav.navigate(Routes.MINDSET) }
+            )
+        }
         composable(Routes.STATS) { StatsScreen(vm) }
         composable(Routes.CHALLENGES) { ChallengesScreen(vm) }
         composable(Routes.MINDSET) { MindsetScreen(vm, settings) }

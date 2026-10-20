@@ -113,10 +113,10 @@ private fun AppShell(vm: GogginsViewModel, settings: AppSettings) {
         bottomBar = {
             NavigationBar(containerColor = MaterialTheme.colorScheme.background) {
                 val items = listOf(
-                    Triple(Routes.TODAY, "СЕГОДНЯ", Icons.Outlined.CheckCircle),
-                    Triple(Routes.STATS, "ДАННЫЕ", Icons.Outlined.BarChart),
-                    Triple(Routes.CHALLENGES, "АД", Icons.Outlined.Whatshot),
-                    Triple(Routes.MINDSET, "РАЗУМ", Icons.Outlined.Lightbulb),
+                    Triple(Routes.TODAY, "Сегодня", Icons.Outlined.CheckCircle),
+                    Triple(Routes.STATS, "Обзор", Icons.Outlined.BarChart),
+                    Triple(Routes.CHALLENGES, "Вызовы", Icons.Outlined.Whatshot),
+                    Triple(Routes.MINDSET, "Законы", Icons.Outlined.Lightbulb),
                 )
                 items.forEach { (r, label, icon) ->
                     NavigationBarItem(

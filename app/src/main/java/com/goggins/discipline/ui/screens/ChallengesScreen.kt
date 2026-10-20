@@ -1,6 +1,5 @@
 package com.goggins.discipline.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,94 +10,89 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.goggins.discipline.data.content.Challenges
 import com.goggins.discipline.ui.GogginsViewModel
-import com.goggins.discipline.ui.components.DotMatrix
-import com.goggins.discipline.ui.components.GlyphHeader
 import com.goggins.discipline.ui.components.NothingCard
+import com.goggins.discipline.ui.theme.NothingGreen
 import com.goggins.discipline.ui.theme.NothingRed
 
 @Composable
 fun ChallengesScreen(vm: GogginsViewModel) {
     val state by vm.challengeState.collectAsState()
     val byId = state.associateBy { it.challengeId }
+    var expandedId by remember { mutableStateOf<String?>(null) }
 
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        run {
-            Spacer(Modifier.height(12.dp))
-            GlyphHeader("ИСПЫТАНИЯ · HELL", "${Challenges.all.size} ШТ.")
-            DotMatrix()
-            NothingCard {
-                Text(
-                    "Правила Гоггинса: сорвался — начинай с дня 1. Без переговоров. Отмечай дни кнопкой. Дойди до конца.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-            }
+    Column(
+        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Column(Modifier.padding(top = 18.dp, bottom = 4.dp)) {
+            Text("Вызовы", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onBackground)
+            Text("Выбери один. Отмечай выполненный день.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        Challenges.all.forEach { c ->
-            val done = byId[c.id]?.daysDone ?: 0
-            val finished = byId[c.id]?.finished == true
+
+        Challenges.all.forEach { challenge ->
+            val progress = byId[challenge.id]?.daysDone ?: 0
+            val finished = byId[challenge.id]?.finished == true
+            val expanded = expandedId == challenge.id
             NothingCard {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Text(c.title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
-                        Spacer(Modifier.height(2.dp))
-                        Text("☠ × ${c.skulls} · ${c.days} ДН.", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Spacer(Modifier.height(10.dp))
-                        Text(c.description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Spacer(Modifier.height(8.dp))
-                        Text("ЗАКОН: ${c.rule}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onBackground)
-                        Spacer(Modifier.height(12.dp))
-                        LinearProgressIndicator(
-                            progress = { if (c.days == 0) 0f else (done.toFloat() / c.days).coerceIn(0f, 1f) },
-                            color = if (finished) Color(0xFF3DDC84) else NothingRed,
-                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                            modifier = Modifier.fillMaxWidth().height(4.dp)
-                        )
-                        Spacer(Modifier.height(10.dp))
-                        Text(
-                            if (finished) "ЗАКРЫТО. ТЫ ЗВЕРЬ. STAY HARD."
-                            else "ДЕНЬ $done / ${c.days}",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = if (finished) Color(0xFF3DDC84) else MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        Text(challenge.title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
+                        Spacer(Modifier.height(3.dp))
+                        Text("${challenge.days} дней · ${challenge.skulls} уровень", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
+                    Text(if (finished) "Готово" else "$progress / ${challenge.days}", style = MaterialTheme.typography.labelLarge, color = if (finished) NothingGreen else MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                Spacer(Modifier.height(16.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Button(
-                        onClick = { vm.toggleChallengeDay(c.id) },
-                        enabled = !finished,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.onBackground,
-                            contentColor = MaterialTheme.colorScheme.background,
-                            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant
-                        ),
-                        shape = MaterialTheme.shapes.small
-                    ) { Text("+1 ДЕНЬ", style = MaterialTheme.typography.labelLarge) }
-                    OutlinedButton(onClick = { vm.resetChallenge(c.id) }, shape = MaterialTheme.shapes.small) {
-                        Text("РЕСТАРТ", style = MaterialTheme.typography.labelLarge)
+                Spacer(Modifier.height(10.dp))
+                LinearProgressIndicator(
+                    progress = { if (challenge.days == 0) 0f else (progress.toFloat() / challenge.days).coerceIn(0f, 1f) },
+                    color = if (finished) NothingGreen else NothingRed,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                    modifier = Modifier.fillMaxWidth().height(4.dp)
+                )
+                TextButton(onClick = { expandedId = if (expanded) null else challenge.id }) {
+                    Text(if (expanded) "Скрыть детали" else "Описание и правила", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                if (expanded) {
+                    Text(challenge.description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
+                    Spacer(Modifier.height(8.dp))
+                    Text("Правило: ${challenge.rule}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(Modifier.height(12.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(
+                            onClick = { vm.toggleChallengeDay(challenge.id) },
+                            enabled = !finished,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.onBackground,
+                                contentColor = MaterialTheme.colorScheme.background,
+                                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant
+                            ),
+                            shape = MaterialTheme.shapes.small
+                        ) { Text("Отметить день") }
+                        OutlinedButton(onClick = { vm.resetChallenge(challenge.id) }, shape = MaterialTheme.shapes.small) {
+                            Text("Начать заново")
+                        }
                     }
                 }
             }
         }
-        run { Spacer(Modifier.height(90.dp)) }
+        Spacer(Modifier.height(72.dp))
     }
 }
