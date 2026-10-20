@@ -121,7 +121,7 @@ fun SettingsScreen(vm: GogginsViewModel, s: AppSettings, onBack: () -> Unit) {
                 Text("ПРЕДПРОСМОТР", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    "«${VerbalAssault.insult(s.profanity, seed = 3)}»",
+                    "«${VerbalAssault.insult(s.profanity, seed = 2, userName = s.userName, habitTitle = "тренировку")}»",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -136,7 +136,7 @@ fun SettingsScreen(vm: GogginsViewModel, s: AppSettings, onBack: () -> Unit) {
                 }
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    "Напоминание приходит щадящим (максимум MILD), чтобы не получить бан и не обидеть. Жесть — только внутри приложения.",
+                    "Напоминание использует выбранный уровень. Текст может быть виден на экране блокировки; отключи напоминания, если это не подходит.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

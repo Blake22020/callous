@@ -1,8 +1,12 @@
 package com.goggins.discipline
 
 import android.os.Bundle
+import android.os.Build
+import android.content.pm.PackageManager
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,7 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.BarChart
@@ -24,6 +28,7 @@ import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.Whatshot
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -34,6 +39,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,12 +49,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.goggins.discipline.data.content.VerbalAssault
+import com.goggins.discipline.data.settings.AppSettings
 import com.goggins.discipline.data.settings.ProfanityLevel
 import com.goggins.discipline.ui.GogginsViewModel
 import com.goggins.discipline.ui.components.DotMatrix
@@ -62,16 +72,31 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Запрос разрешения на уведомления на Android 13+ — молча, без падения.
-        if (android.os.Build.VERSION.SDK_INT >= 33) {
-            requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 41)
-        }
         setContent {
-            val settings by vm.settings.collectAsState()
+            val settingsState by vm.settingsState.collectAsState()
+            val settings = settingsState.settings
+            val notificationPermission = rememberLauncherForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { }
+            LaunchedEffect(settingsState.loaded, settings.toneConsentAccepted) {
+                if (settingsState.loaded && settings.toneConsentAccepted && Build.VERSION.SDK_INT >= 33 &&
+                    ContextCompat.checkSelfPermission(
+                        this@MainActivity,
+                        android.Manifest.permission.POST_NOTIFICATIONS
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    notificationPermission.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
             GogginsTheme(dark = settings.darkTheme) {
                 Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    if (!settings.onboarded) Onboarding(vm)
-                    else AppShell(vm)
+                    when {
+                        !settingsState.loaded -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text("CALLOUS", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        !settings.onboarded || !settings.toneConsentAccepted -> Onboarding(vm, settings)
+                        else -> AppShell(vm, settings)
+                    }
                 }
             }
         }
@@ -79,7 +104,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun AppShell(vm: GogginsViewModel) {
+private fun AppShell(vm: GogginsViewModel, settings: AppSettings) {
     val nav = rememberNavController()
     val back by nav.currentBackStackEntryAsState()
     val route = back?.destination?.route
@@ -113,14 +138,16 @@ private fun AppShell(vm: GogginsViewModel) {
             }
         }
     ) { pad ->
-        Box(Modifier.padding(pad)) { NavGraph(nav, vm) }
+        Box(Modifier.padding(pad)) { NavGraph(nav, vm, settings) }
     }
 }
 
 @Composable
-private fun Onboarding(vm: GogginsViewModel) {
-    var name by remember { mutableStateOf("") }
-    var level by remember { mutableStateOf(ProfanityLevel.MILD) }
+private fun Onboarding(vm: GogginsViewModel, settings: AppSettings) {
+    val firstRun = !settings.onboarded
+    var name by remember { mutableStateOf(settings.userName) }
+    var level by remember { mutableStateOf(settings.profanity) }
+    var acceptedTone by remember(level) { mutableStateOf(false) }
 
     Column(
         Modifier.fillMaxSize().padding(24.dp),
@@ -144,7 +171,7 @@ private fun Onboarding(vm: GogginsViewModel) {
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                "ТРЕКЕР ДИСЦИПЛИНЫ",
+                if (firstRun) "ТРЕКЕР ДИСЦИПЛИНЫ" else "ПОДТВЕРДИ СТИЛЬ ОБЩЕНИЯ",
                 style = MaterialTheme.typography.labelLarge,
                 color = NothingRed
             )
@@ -152,17 +179,23 @@ private fun Onboarding(vm: GogginsViewModel) {
             DotMatrix()
             Spacer(Modifier.height(18.dp))
             Text(
-                "Никто не придёт тебя спасать.\nЭто приложение — твоё зеркало ответственности: привычки, стрики, испытания и пинки от Гоггинса.",
+                if (firstRun) {
+                    "Никто не придёт тебя спасать.\nВыбери, насколько жёстко CALLOUS будет с тобой говорить."
+                } else {
+                    "Привычки и прогресс останутся. Подтверди уровень общения, чтобы продолжить."
+                },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
-            Spacer(Modifier.height(22.dp))
-            OutlinedTextField(
-                value = name, onValueChange = { name = it },
-                label = { Text("Как звать, боец?") },
-                singleLine = true, modifier = Modifier.fillMaxWidth()
-            )
+            if (firstRun) {
+                Spacer(Modifier.height(22.dp))
+                OutlinedTextField(
+                    value = name, onValueChange = { name = it },
+                    label = { Text("Как звать, боец?") },
+                    singleLine = true, modifier = Modifier.fillMaxWidth()
+                )
+            }
             Spacer(Modifier.height(18.dp))
             Text(
                 "НАСКОЛЬКО ЖЁСТКО С ТОБОЙ ГОВОРИТЬ?",
@@ -201,19 +234,49 @@ private fun Onboarding(vm: GogginsViewModel) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
+            Spacer(Modifier.height(8.dp))
+            Text("ПРЕДПРОСМОТР", style = MaterialTheme.typography.labelSmall, color = NothingRed)
+            Spacer(Modifier.height(4.dp))
+            Text(
+                "«${VerbalAssault.insult(level, seed = 2, userName = name.trim(), habitTitle = "тренировку")}»",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Spacer(Modifier.height(14.dp))
+            Row(
+                Modifier.fillMaxWidth()
+                    .clip(MaterialTheme.shapes.small)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .toggleable(
+                        value = acceptedTone,
+                        role = Role.Checkbox,
+                        onValueChange = { acceptedTone = it }
+                    )
+                    .padding(horizontal = 8.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Checkbox(checked = acceptedTone, onCheckedChange = null)
+                Text(
+                    "Я согласен на выбранный уровень мата и прямых оскорблений в приложении и напоминаниях. Уровень можно сменить, напоминания отключить в настройках; текст уведомления может быть виден на экране блокировки.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f).padding(top = 10.dp)
+                )
+            }
             Spacer(Modifier.height(16.dp))
         }
         Button(
             onClick = {
-                vm.setName(name.trim())
-                vm.setProfanity(level)
-                vm.setOnboarded()
-                if (name.trim().isEmpty().not()) vm.addHabit("Отжаться 50 раз", "◼")
+                vm.completeOnboarding(name.trim(), level)
+                if (firstRun && name.trim().isNotEmpty()) {
+                    vm.addHabit("Отжаться 50 раз", "◼", level, name.trim(), announce = false)
+                }
             },
+            enabled = acceptedTone,
             modifier = Modifier.fillMaxWidth().height(54.dp),
             shape = MaterialTheme.shapes.small,
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onBackground, contentColor = MaterialTheme.colorScheme.background)
-        ) { Text("НАЧАТЬ", style = MaterialTheme.typography.labelLarge) }
+        ) { Text(if (firstRun) "СОГЛАСЕН · НАЧАТЬ" else "СОГЛАСЕН · ПРОДОЛЖИТЬ", style = MaterialTheme.typography.labelLarge) }
         Spacer(Modifier.height(12.dp))
     }
 }

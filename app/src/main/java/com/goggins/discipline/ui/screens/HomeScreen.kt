@@ -52,6 +52,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.goggins.discipline.data.content.Quotes
+import com.goggins.discipline.data.content.VerbalAssault
 import com.goggins.discipline.data.settings.AppSettings
 import com.goggins.discipline.ui.GogginsViewModel
 import com.goggins.discipline.ui.HabitUi
@@ -130,19 +131,13 @@ fun HomeScreen(vm: GogginsViewModel, settings: AppSettings, onSettings: () -> Un
                         ProgressRing(progress)
                         Spacer(Modifier.width(18.dp))
                         Column(Modifier.weight(1f)) {
+                            val done = list.count { it.done }
                             Text(
-                                when {
-                                    list.isEmpty() -> "НЕТ ПРИВЫЧЕК.\nДОБАВЬ ПЕРВУЮ."
-                                    progress >= 1f -> "ВСЁ ЗАКРЫТО.\nТЫ ЗВЕРЬ."
-                                    progress >= 0.6f -> "ДАВИ ДАЛЬШЕ.\nОСТАЛОСЬ НЕМНОГО."
-                                    progress > 0f -> "НАЧАЛО ЕСТЬ.\nНЕ СМЕЙ ОСТАНАВЛИВАТЬСЯ."
-                                    else -> "НОЛЬ.\nЗЕРКАЛО ВСЁ ВИДЕЛО."
-                                },
+                                VerbalAssault.homeMessage(settings.profanity, done, list.size, settings.userName),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onBackground
                             )
                             Spacer(Modifier.height(10.dp))
-                            val done = list.count { it.done }
                             Text(
                                 "[$done/${list.size}] ЗАКРЫТО",
                                 style = MaterialTheme.typography.labelSmall,
@@ -188,7 +183,7 @@ fun HomeScreen(vm: GogginsViewModel, settings: AppSettings, onSettings: () -> Un
             }
 
             list.forEach { h ->
-                HabitRow(h, onToggle = { vm.toggle(h, settings.profanity) }, onDelete = { vm.deleteHabit(h.habit) })
+                HabitRow(h, onToggle = { vm.toggle(h, settings.profanity, settings.userName) }, onDelete = { vm.deleteHabit(h.habit) })
             }
 
             run {
@@ -251,7 +246,7 @@ fun HomeScreen(vm: GogginsViewModel, settings: AppSettings, onSettings: () -> Un
             },
             confirmButton = {
                 TextButton(onClick = {
-                    vm.addHabit(newTitle, newIcon)
+                    vm.addHabit(newTitle, newIcon, settings.profanity, settings.userName)
                     newTitle = ""; newIcon = "◼"; showAdd = false
                 }) { Text("ДОБАВИТЬ", style = MaterialTheme.typography.labelLarge, color = NothingRed) }
             },

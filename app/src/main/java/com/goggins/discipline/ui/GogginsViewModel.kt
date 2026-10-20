@@ -24,12 +24,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 
 data class HabitUi(val habit: Habit, val done: Boolean, val streak: Int)
+data class SettingsUiState(val settings: AppSettings = AppSettings(), val loaded: Boolean = false)
 
 class GogginsViewModel(app: Application) : AndroidViewModel(app) {
 
@@ -38,7 +40,11 @@ class GogginsViewModel(app: Application) : AndroidViewModel(app) {
     private val repo = HabitRepository(db)
     private val settingsManager = SettingsManager(app)
 
-    val settings: StateFlow<AppSettings> = settingsManager.settings
+    val settingsState: StateFlow<SettingsUiState> = settingsManager.settings
+        .map { SettingsUiState(settings = it, loaded = true) }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, SettingsUiState())
+    val settings: StateFlow<AppSettings> = settingsState
+        .map { it.settings }
         .stateIn(viewModelScope, SharingStarted.Eagerly, AppSettings())
 
     private val _habits = MutableStateFlow<List<Habit>>(emptyList())
@@ -85,11 +91,17 @@ class GogginsViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     // ---------- habits ----------
-    fun addHabit(title: String, icon: String) {
+    fun addHabit(
+        title: String,
+        icon: String,
+        profanity: ProfanityLevel = settings.value.profanity,
+        userName: String = settings.value.userName,
+        announce: Boolean = true
+    ) {
         if (title.isBlank()) return
         viewModelScope.launch {
             repo.addHabit(title, icon.ifBlank { "◼" })
-            sayGood()
+            if (announce) sayGood(profanity, userName, title)
         }
     }
 
@@ -97,11 +109,12 @@ class GogginsViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch { repo.deleteHabit(h) }
     }
 
-    fun toggle(h: HabitUi, profanity: ProfanityLevel) {
+    fun toggle(h: HabitUi, profanity: ProfanityLevel, userName: String) {
         viewModelScope.launch {
             val makeDone = !h.done
             repo.toggle(h.habit.id, todayKey(), makeDone)
-            if (makeDone) sayGood() else sayBad(profanity)
+            if (makeDone) sayGood(profanity, userName, h.habit.title)
+            else sayBad(profanity, userName, h.habit.title)
         }
     }
 
@@ -110,26 +123,29 @@ class GogginsViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     // ---------- verdicts ----------
-    private fun sayGood() {
-        val pool = listOf(
-            "Галочка стоит. Так держать.",
-            "Слово сдержано. Это и есть свобода.",
-            "Боль прошла. Гордость осталась. STAY HARD."
-        )
+    private fun sayGood(level: ProfanityLevel, userName: String, habitTitle: String) {
         _verdictBad.value = false
-        _verdict.value = pool.random()
+        _verdict.value = com.goggins.discipline.data.content.VerbalAssault.praise(
+            level,
+            userName = userName,
+            habitTitle = habitTitle
+        )
     }
 
-    private fun sayBad(level: ProfanityLevel) {
+    private fun sayBad(level: ProfanityLevel, userName: String, habitTitle: String) {
         _verdictBad.value = true
         _shakeKey.value += 1
-        _verdict.value = com.goggins.discipline.data.content.VerbalAssault.insult(level)
+        _verdict.value = com.goggins.discipline.data.content.VerbalAssault.insult(
+            level,
+            userName = userName,
+            habitTitle = habitTitle
+        )
     }
 
-    fun punchMe(level: ProfanityLevel) {
+    fun punchMe(level: ProfanityLevel, userName: String) {
         _verdictBad.value = true
         _shakeKey.value += 1
-        _verdict.value = com.goggins.discipline.data.content.VerbalAssault.insult(level)
+        _verdict.value = com.goggins.discipline.data.content.VerbalAssault.insult(level, userName = userName)
     }
 
     fun dismissVerdict() { _verdict.value = null }
@@ -155,7 +171,10 @@ class GogginsViewModel(app: Application) : AndroidViewModel(app) {
     fun setProfanity(v: ProfanityLevel) = viewModelScope.launch { settingsManager.setProfanity(v) }
     fun setDark(v: Boolean) = viewModelScope.launch { settingsManager.setDark(v) }
     fun setReminder(e: Boolean, h: Int, m: Int) = viewModelScope.launch { settingsManager.setReminder(e, h, m) }
-    fun setOnboarded() = viewModelScope.launch { settingsManager.setOnboarded() }
+    fun completeOnboarding(name: String, profanity: ProfanityLevel) = viewModelScope.launch {
+        settingsManager.completeOnboarding(name, profanity)
+    }
+    fun markPowerLawApplied(date: String) = viewModelScope.launch { settingsManager.markPowerLawApplied(date) }
 
     fun wipeAll() {
         viewModelScope.launch {

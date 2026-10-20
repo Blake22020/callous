@@ -8,23 +8,21 @@ import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.goggins.discipline.GogginsApp
-import com.goggins.discipline.data.content.Quotes
+import com.goggins.discipline.data.content.PowerLaws
+import com.goggins.discipline.data.content.VerbalAssault
 import com.goggins.discipline.data.settings.SettingsManager
 import kotlinx.coroutines.flow.first
 
-/**
- * Ежедневный пинок. Уведомления всегда максимум MILD,
- * чтобы не прилетело от сторов и чувствительных людей —
- * жесть живёт только внутри приложения.
- */
+/** Ежедневное напоминание с уровнем речи, который пользователь выбрал и подтвердил. */
 class ReminderWorker(appContext: Context, params: WorkerParameters) : CoroutineWorker(appContext, params) {
     override suspend fun doWork(): Result {
         val settings = SettingsManager(applicationContext).settings.first()
         if (!settings.reminderEnabled) return Result.success()
-        val q = Quotes.daily(System.currentTimeMillis() / 86_400_000L)
+        val law = PowerLaws.forDate()
         val name = settings.userName.ifBlank { "боец" }
         val title = "ПОДЪЁМ, $name. STAY HARD."
-        val text = q.text
+        val lesson = "Закон дня ${law.number}/48 · ${law.title}\n\n${law.idea}\n\nДействие: ${law.action}"
+        val text = VerbalAssault.reminder(settings.profanity, name, lesson)
 
         if (ActivityCompat.checkSelfPermission(
                 applicationContext,

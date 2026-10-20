@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -30,14 +29,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.goggins.discipline.data.content.PowerLaw
+import com.goggins.discipline.data.content.PowerLaws
 import com.goggins.discipline.data.content.Quotes
 import com.goggins.discipline.data.content.SosLibrary
+import com.goggins.discipline.data.content.VerbalAssault
 import com.goggins.discipline.data.settings.AppSettings
 import com.goggins.discipline.ui.GogginsViewModel
 import com.goggins.discipline.ui.components.DotMatrix
@@ -45,27 +44,36 @@ import com.goggins.discipline.ui.components.GlyphHeader
 import com.goggins.discipline.ui.components.NothingCard
 import com.goggins.discipline.ui.components.ShakeBox
 import com.goggins.discipline.ui.theme.NothingRed
+import java.time.LocalDate
+import java.time.ZoneId
+import kotlinx.coroutines.delay
 
 @Composable
 fun MindsetScreen(vm: GogginsViewModel, settings: AppSettings) {
     val ctx = LocalContext.current
     var current by remember { mutableStateOf(Quotes.random()) }
     var sosId by remember { mutableStateOf(SosLibrary.all.first().id) }
+    var today by remember { mutableStateOf(LocalDate.now()) }
     val sos = SosLibrary.all.firstOrNull { it.id == sosId } ?: SosLibrary.all.first()
+    val law = remember(today) { PowerLaws.forDate(today) }
+    val lawApplied = settings.appliedPowerLawDate == today.toString()
     val verdict by vm.verdict.collectAsState()
     val shakeKey by vm.shakeKey.collectAsState()
 
-    // Плавное появление цитаты БЕЗ AnimatedContent:
-    // AnimatedContent в LazyColumn схлопывал высоту и кнопки налезали на текст.
-    // Без анимаций: любая анимация в LazyColumn на части устройств давала
-    // повторную рекомпозицию и наложение текста друг на друга.
-    val shown = true
+    LaunchedEffect(Unit) {
+        while (true) {
+            val nextDay = LocalDate.now().plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+            delay((nextDay - System.currentTimeMillis()).coerceAtLeast(1_000L))
+            today = LocalDate.now()
+        }
+    }
 
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         run {
             Spacer(Modifier.height(12.dp))
             GlyphHeader("РАЗУМ · MINDSET", "CALLOUS IT")
             DotMatrix()
+            PowerLawCard(law, lawApplied) { vm.markPowerLawApplied(today.toString()) }
             NothingCard {
                 Column {
                     Text("«${current.text}»", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
@@ -92,7 +100,7 @@ fun MindsetScreen(vm: GogginsViewModel, settings: AppSettings) {
                 }
                 Spacer(Modifier.height(10.dp))
                 OutlinedButton(
-                    onClick = { vm.punchMe(settings.profanity) },
+                    onClick = { vm.punchMe(settings.profanity, settings.userName) },
                     shape = MaterialTheme.shapes.small,
                     modifier = Modifier.fillMaxWidth()
                 ) { Text("ДОБЕЙ МЕНЯ", style = MaterialTheme.typography.labelLarge, color = NothingRed) }
@@ -109,7 +117,7 @@ fun MindsetScreen(vm: GogginsViewModel, settings: AppSettings) {
             GlyphHeader("SOS · АПТЕЧКА", "ЧИТАЙ ПО СОСТОЯНИЮ")
             NothingCard {
                 Text(
-                    "Плохо? Выбери состояние — получи текст, который надо прочитать целиком. Медленно. Два раза.",
+                    VerbalAssault.sosIntro(settings.profanity, settings.userName),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -169,4 +177,50 @@ fun MindsetScreen(vm: GogginsViewModel, settings: AppSettings) {
             confirmButton = { TextButton(onClick = { vm.dismissVerdict() }) { Text("ПРИНЯЛ.", style = MaterialTheme.typography.labelLarge) } }
         )
     }
+}
+
+@Composable
+private fun PowerLawCard(law: PowerLaw, applied: Boolean, onApply: () -> Unit) {
+    GlyphHeader("ЗАКОН ДНЯ · ВЛАСТЬ", "${law.number}/48")
+    NothingCard {
+        Text("ЗАКОН ${law.number.toString().padStart(2, '0')}", style = MaterialTheme.typography.labelSmall, color = NothingRed)
+        Spacer(Modifier.height(6.dp))
+        Text(law.title, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
+        Spacer(Modifier.height(14.dp))
+        LawSection("СУТЬ", law.idea)
+        LawSection("ПРИМЕР", law.example)
+        LawSection("ПРИМЕНЕНИЕ", law.use)
+        LawSection("КАК ЗАЩИТИТЬСЯ", law.defense)
+        LawSection("ДЕЙСТВИЕ НА СЕГОДНЯ", law.action)
+        Spacer(Modifier.height(8.dp))
+        Button(
+            onClick = onApply,
+            enabled = !applied,
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.small,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.onBackground,
+                contentColor = MaterialTheme.colorScheme.background
+            )
+        ) {
+            Text(
+                if (applied) "ВЫПОЛНЕНО СЕГОДНЯ" else "ОТМЕТИТЬ ВЫПОЛНЕНИЕ",
+                style = MaterialTheme.typography.labelLarge
+            )
+        }
+        Spacer(Modifier.height(8.dp))
+        Text(
+            "Авторский разбор идей Роберта Грина. Закон меняется по местной дате; цикл — 48 дней.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun LawSection(label: String, text: String) {
+    Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    Spacer(Modifier.height(3.dp))
+    Text(text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
+    Spacer(Modifier.height(12.dp))
 }

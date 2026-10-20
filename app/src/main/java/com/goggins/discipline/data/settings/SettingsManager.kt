@@ -18,7 +18,9 @@ data class AppSettings(
     val reminderEnabled: Boolean = true,
     val reminderHour: Int = 6,
     val reminderMinute: Int = 0,
-    val onboarded: Boolean = false
+    val onboarded: Boolean = false,
+    val toneConsentAccepted: Boolean = false,
+    val appliedPowerLawDate: String = ""
 )
 
 class SettingsManager(private val context: Context) {
@@ -31,6 +33,8 @@ class SettingsManager(private val context: Context) {
         val RH = intPreferencesKey("reminder_h")
         val RM = intPreferencesKey("reminder_m")
         val ONB = booleanPreferencesKey("onboarded")
+        val TONE_CONSENT = booleanPreferencesKey("tone_consent_accepted")
+        val APPLIED_POWER_LAW_DATE = stringPreferencesKey("applied_power_law_date")
     }
 
     val settings: Flow<AppSettings> = context.dataStore.data.map { p ->
@@ -41,7 +45,9 @@ class SettingsManager(private val context: Context) {
             reminderEnabled = p[K.REM] ?: true,
             reminderHour = p[K.RH] ?: 6,
             reminderMinute = p[K.RM] ?: 0,
-            onboarded = p[K.ONB] ?: false
+            onboarded = p[K.ONB] ?: false,
+            toneConsentAccepted = p[K.TONE_CONSENT] ?: false,
+            appliedPowerLawDate = p[K.APPLIED_POWER_LAW_DATE].orEmpty()
         )
     }
 
@@ -51,6 +57,14 @@ class SettingsManager(private val context: Context) {
     suspend fun setReminder(enabled: Boolean, h: Int, m: Int) = context.dataStore.edit {
         it[K.REM] = enabled; it[K.RH] = h; it[K.RM] = m
     }
-    suspend fun setOnboarded() = context.dataStore.edit { it[K.ONB] = true }
+    suspend fun completeOnboarding(name: String, profanity: ProfanityLevel) = context.dataStore.edit {
+        it[K.NAME] = name
+        it[K.PROF] = profanity.ordinal
+        it[K.ONB] = true
+        it[K.TONE_CONSENT] = true
+    }
+    suspend fun markPowerLawApplied(date: String) = context.dataStore.edit {
+        it[K.APPLIED_POWER_LAW_DATE] = date
+    }
     suspend fun resetAll() = context.dataStore.edit { it.clear() }
 }

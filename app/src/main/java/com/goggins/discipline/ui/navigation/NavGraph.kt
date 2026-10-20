@@ -1,12 +1,11 @@
 package com.goggins.discipline.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.goggins.discipline.ui.GogginsViewModel
+import com.goggins.discipline.data.settings.AppSettings
 import com.goggins.discipline.ui.screens.ChallengesScreen
 import com.goggins.discipline.ui.screens.HomeScreen
 import com.goggins.discipline.ui.screens.MindsetScreen
@@ -22,8 +21,7 @@ object Routes {
 }
 
 @Composable
-fun NavGraph(nav: NavHostController, vm: GogginsViewModel) {
-    val settings by vm.settings.collectAsState()
+fun NavGraph(nav: NavHostController, vm: GogginsViewModel, settings: AppSettings) {
     NavHost(nav, startDestination = Routes.TODAY) {
         composable(Routes.TODAY) { HomeScreen(vm, settings, onSettings = { nav.navigate(Routes.SETTINGS) }) }
         composable(Routes.STATS) { StatsScreen(vm) }

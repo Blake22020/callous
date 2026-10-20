@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-10-20
+
+### Added
+
+- Onboarding consent for the selected harsh communication style, with a live tone preview and saved profanity level
+- Daily lesson inspired by one of the 48 laws of power, with a detailed explanation, example, application, defense, and daily action
+- Daily reminder includes the current law of the day
+- Expanded tone-aware coaching across home, SOS, feedback, praise, and reminders
+
+### Changed
+
+- Returning users confirm the communication style after upgrading; existing progress stays intact
+- Refined onboarding and daily lesson presentation in the Nothing-inspired design
+
 ## [1.4.1] - 2026-10-17
 
 ### Fixed
@@ -83,7 +97,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Profanity levels: CLEAN / MILD / SAVAGE / NIGHTMARE
 - Daily reminder and light/dark themes
 
-[Unreleased]: https://github.com/Blake22020/callous/compare/v1.4.1...HEAD
+[Unreleased]: https://github.com/Blake22020/callous/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/Blake22020/callous/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/Blake22020/callous/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/Blake22020/callous/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/Blake22020/callous/compare/v1.3.0...v1.3.1
